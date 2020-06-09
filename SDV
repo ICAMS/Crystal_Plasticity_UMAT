@@ -1,0 +1,37 @@
+commen SDV:
+euler angle (3 components) eang(1-3)
+misorientation (1 component) eang(4)
+cauchy stress (6 components) cs
+second Piola-Kirchhoff stress (6 components) pk2i
+internal stress_GND (6 components) pk2i_GND
+Fe (9 components)
+Fp (9 components)
+IVB (depends on slip systems of materials, 12-60 components)
+
+if Iwkcoup_int/=0
+internal stress_x (6 components) pk2i_intx
+internal stress_y (6 components) pk2i_inty
+internal stress_z (6 components) pk2i_intz
+internal stress_p (6 components) pk2i_intp
+eigen strain_x (6 components) epsx
+eigen strain_y (6 components) epsy
+eigen strain_z (6 components) epsz
+eigen strain_p (6 components) epsp
+
+if Iwkcoup_sup/=0
+IVB_cl (36 components)
+IVB_m (12 components)
+IVB_kw (12 components)
+
+if Iwkcoup_bk/=0
+IVB_bk (depends on slip systems of materials, 12-48 components)
+
+if Iwkcoup_grad/=0
+IVB_GND (12 components)
+tau_GND (12 components)
+
+if Iwkcoup_trip/=0
+Vtrp_e (12 components)
+Vtrp_s (12 components)
+
+
