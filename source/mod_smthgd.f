@@ -65,6 +65,7 @@ c----------------------------------------------------
             iex=fft_Inf(ix,iy,iz,1)
             igx=fft_Inf(ix,iy,iz,2)
             if(iex/=0.and.igx/=0) then
+c               fft_V0(ix,iy,iz)=fem_Fp0(iex,igx,ip1,ip2)
 
                if(fft_Inf(ix,iy,iz,3)==1)then              !=====> internal
                   fft_V0(ix,iy,iz)=fem_Fp0(iex,igx,ip1,ip2)
@@ -75,6 +76,9 @@ c----------------------------------------------------
                   fft_V0(ix,iy,iz)=fem_Fp0(iex,igx,ip1,ip2)*1.0
                endif
             endif
+
+
+c       print*,ix,iy,iz,fft_Inf(ix,iy,iz,3),fft_V0(ix,iy,iz)
 
          enddo         
          enddo         
@@ -113,9 +117,37 @@ c----------------------------------------------------
          enddo
          enddo
 
-      enddo
-      enddo
+c         !-------------------------------------------------------
+c         ! Remove imaginary matrix
+c         !-------------------------------------------------------
+c         do ix=1,Nftx
+c         do iy=1,Nfty
+c         do iz=1,Nftz
+c            x1=fft_xyz(ix,iy,iz,1)
+c            x2=fft_xyz(ix,iy,iz,2)
+c            x3=fft_xyz(ix,iy,iz,3)
+c            if((x1<Lx(2).or.x1>Lx(3)).or.
+c     &         (x2<Ly(2).or.x2>Ly(3)).or.
+c     &         (x3<Lz(2).or.x3>Lz(3))) then
+c               fft_V0    (ix,iy,iz)    =0
+c               fft_V1    (ix,iy,iz)    =0
+c               fft_dVdx  (ix,iy,iz,:)  =0
+c               fft_ddVddx(ix,iy,iz,:,:)=0
+c            endif
+c         enddo
+c         enddo
+c         enddo
+c         !-------------------------------------------------------
+c         ! Make plot file for ovito
+c         !-------------------------------------------------------
+c         if(ip1==1.and.ip2==1)then
+c            call output_ovito(fft_V0,fft_V1,fft_dVdx,fft_ddVddx,
+c     &                        Nftx,Nfty,Nftz)
+c         endif
 
+      enddo
+      enddo
+c
       return
       end
 
@@ -197,6 +229,9 @@ c--------check convergence of (R1,I1) in hetergenious material
          enddo
          enddo
          rsd = rsd/(Nftx*Nfty*Nftz)
+
+         print '(2I5,10e15.5)',Iloop,Nloop,rsd,Crsd
+c         read*
 
          if(rsd < Crsd) goto 102
 
@@ -318,16 +353,22 @@ c--------------------
          if(Nftx>2)then
             x1=fft_V1(ix1, iy, iz  )
             x2=fft_V1(ix2, iy, iz  )
+!            x1=fft_V0(ix1, iy, iz  )
+!            x2=fft_V0(ix2, iy, iz  )
             fft_dVdx (ix,  iy, iz,1)=(x2-x1)/2/detx
          endif
          if(Nfty>2)then
             x1=fft_V1(ix, iy1, iz  )
             x2=fft_V1(ix, iy2, iz  )
+!            x1=fft_V0(ix, iy1, iz  )
+!            x2=fft_V0(ix, iy2, iz  )
             fft_dVdx (ix, iy,  iz,2)=(x2-x1)/2/dety
          endif
          if(Nftz>2)then
             x1=fft_V1(ix, iy, iz1  )
             x2=fft_V1(ix, iy, iz2  )
+!            x1=fft_V0(ix, iy, iz1  )
+!            x2=fft_V0(ix, iy, iz2  )
             fft_dVdx (ix, iy, iz, 3)=(x2-x1)/2/detz
          endif
 

@@ -84,11 +84,7 @@ c         integer :: Imth_add=0  !0: multidcp, 1: adddcp
 !---------------------------------------------------------------c
          real(8) Ftrp(3,3)
          real(8) IFtrp(3,3)
-         real(8) IVB_trp(Nslp_mx),IVB_wcp(Nslp_mx)
-!---------------------------------------------------------------c
-!        Kinematic hardening effect                            c
-!---------------------------------------------------------------c
-         real(8) IVB_bk(Nslp_mx)
+         real(8) IVB_trp(Nslp_mx),IVB_wcp(Nslp_mx),IVB_bk(Nslp_mx)
 !---------------------------------------------------------------c
 !        climb, matrix dislocation and KW effect                c
 !---------------------------------------------------------------c

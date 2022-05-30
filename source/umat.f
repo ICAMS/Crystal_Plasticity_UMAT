@@ -121,7 +121,8 @@ c---------------------------------------------------------------------------
       integer i,j,k,ii,jj,is,icomp
       real(8) x1,x2,x3,xx
       real(8) mx33_1(3,3)
-      real(8) phi1,phi,phi2,Qm(3,3)
+      real(8) phi1,phi,phi2,Qm(3,3),el_st(3,3)
+      real(8) intLp(3,3)
 c
       ialloy =int(props(1))
       eang00(1:3)=props(2:4)
@@ -217,7 +218,26 @@ c------------------------------------------------c
          call cal_stress_add(ising)
       else
          call cal_stress_mul(ising)
-      endif      
+      endif  
+
+      el_st = (matmul(transpose(Fe),Fe))/2
+      ! elastic strain Ee-SDV150 to 155
+      statev(150) = el_st(1,1)-0.5
+      statev(151) = el_st(2,2)-0.5
+      statev(152) = el_st(3,3)-0.5
+      statev(153) = el_st(1,2)
+      statev(154) = el_st(1,3)
+      statev(155) = el_st(2,3)
+      
+      ! plastic strain in crystal coordinates
+      intLp=0.5*dt1*(Lp+transpose(Lp))
+      statev(156)=statev(156)+intLp(1,1)
+      statev(157)=statev(157)+intLp(2,2)
+      statev(158)=statev(158)+intLp(3,3)
+      statev(159)=statev(159)+intLp(1,2)
+      statev(160)=statev(160)+intLp(1,3)
+      statev(161)=statev(161)+intLp(2,3) 
+      	  
 c------------------------------------------------c
 c     output to ABAQUS statev                    c
 c------------------------------------------------c

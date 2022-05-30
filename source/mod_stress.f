@@ -424,13 +424,6 @@ c               print '(i5,3e14.4)',iNRloop,x1,x2,toler_NRloop
             !1   End of newton raphson method, solve cauchy stress    1
             !1--------------------------------------------------------1 
 
-            if (Iwkcoup_bk/=0) then
-             do is=1,Nslp
-              fem_dgmdt(ie,ig,is)=dgmdt(is)
-             enddo
-            endif
-         
-
             if (Ialloy==5) then
 
             do is=1,36
@@ -491,15 +484,14 @@ c               print '(i5,3e14.4)',iNRloop,x1,x2,toler_NRloop
             call icams_conv33to6(egy,ib1,ib2,epsy)
             call icams_conv33to6(egz,ib1,ib2,epsz)
             call icams_conv33to6(egp,ib1,ib2,epsp)
-
-            fem_epsx(ie,ig,:)=epsx
-            fem_epsy(ie,ig,:)=epsy
-            fem_epsz(ie,ig,:)=epsz
-            fem_epsp(ie,ig,:)=epsp
     
             Lp=fx*Lpx+fy*Lpy+fz*Lpz+fpp*Lpp
 
             else
+
+            do is=1,Nslp
+              fem_dgmdt(ie,ig,is)=dgmdt(is)
+            enddo
 
             call icams_conv6to33(pk2i,ib1,ib2,pk2i_M)
 
