@@ -1,0 +1,57 @@
+** Import geometry/assembly
+*Include, input=PeriodicData/geometry_Periodic.inp
+** 
+**
+** Import MATERIALS
+*Include, input=Material.inp
+** 
+**
+** Define frequency and amplitude of load cycles
+*Amplitude, name=Amp-5, time=TOTAL TIME   
+              0.,              0.,            15.6,             -0.1003,            75.4,              0.1003,             105.5,           -0.1003                                                                                   
+**Include, input=AMPLITUDE.txt                                                           
+**        
+** BOUNDARY CONDITIONS
+*Boundary
+V1,1
+V1,2
+V1,3
+V2,2
+V2,3
+H1,1
+H1,2
+V4,1
+V4,3
+** ----------------------------------------------------------------
+** 
+** STEP: Step-1
+** 
+*Step, name=Step-1, nlgeom=YES, inc=100000000, solver=iterative
+*Static
+0.01, 105.5, 1e-5, 1.
+** 
+** BOUNDARY CONDITIONS
+** 
+** Name: loading Type: Displacement/Rotation
+*Boundary, amplitude=Amp-5
+V4,2,2,0.001
+** 
+** OUTPUT REQUESTS
+** 
+*Restart, write, frequency=0
+** 
+** FIELD OUTPUT: F-Output-1
+** 
+*Output, field, variable=PRESELECT,time interval=1.0
+*Node Output, nset=Vertices
+U, RF, COORD, CF
+*Node Output
+CF, RF, U
+*Element Output, directions=YES
+LE, PE, PEEQ, PEMAG, S, SDV
+** 
+** HISTORY OUTPUT: H-Output-1
+** 
+*Output, history, variable=PRESELECT, time interval=1.0
+**
+*End Step
