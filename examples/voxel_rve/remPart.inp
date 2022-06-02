@@ -1,0 +1,43 @@
+** Name: BC-1 Type: Displacement/Rotation
+*Boundary
+V1,1
+V1,2
+V1,3
+V2,2
+V2,3
+H1,1
+H1,2
+V4,1
+V4,3
+**
+** ----------------------------------------------------------------
+** 
+** STEP: Loading2
+** 
+*Step, name=Loading2, nlgeom=YES, inc=500000, unsymm=YES, solver=ITERATIVE
+*Static
+0.025, 250, 1e-3, 1.0
+**
+** BOUNDARY CONDITIONS
+**
+** LOADS
+**
+** Name: Load Type: Displacement/Rotation
+*Boundary
+H1,3,3, -0.045
+**
+**
+**
+**
+** OUTPUT REQUESTS
+**
+**
+** FIELD OUTPUT: F-Output-1
+** 
+*Output, field
+*Node Output, nset=Vertices
+U,COORD,RF,CF
+** HISTORY OUTPUT: H-Output-1
+** 
+**Output, history, variable=PRESELECT
+*End Step
