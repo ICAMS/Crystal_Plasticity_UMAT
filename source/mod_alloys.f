@@ -876,10 +876,10 @@ c-----------resolved shear stress and resistence
             do is=1,N_slip
                x1=crss0*1.d-10
                x2=crsss
-               if(IVB(is)<x1 .or. IVB(is)>x2)then
-                  ising=112
-                  return
-               endif
+               !if(IVB(is)<x1 .or. IVB(is)>x2)then
+               !   ising=112
+               !   return
+               !endif
             enddo
 
 c-----------shear rate, derivative of shear rate w.r.t. pk2i,IVB

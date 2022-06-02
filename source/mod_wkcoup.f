@@ -1065,7 +1065,7 @@ c================================================================
          real(8),parameter:: A3 = 0.d4
          real(8),parameter:: B3 = 0.d0
          real(8),parameter:: M_OW = 8.0d0
-         real(8),parameter:: N_slp = 48
+         integer,parameter:: N_slp = 48
          real(8) fem_bk(Tnel,Tngp,N_slp)
          real(8) fem_bk_ch(Tnel,Tngp,N_slp,3)
          real(8) fem_dbkdt(Tnel,Tngp,N_slp)
@@ -1156,10 +1156,10 @@ c OWKH
 c================================================================
 c        int: back stress due to Bauschinger effect
 c================================================================
-         subroutine sub_bk_effect(iex,igx,IB1,IB2,IVB_bk)
+         subroutine sub_bk_effect(iex,igx,nsl,IB1,IB2,IVB_bk)
          implicit none
-         integer IB1(9),IB2(9),iex,igx       
-         real(8) IVB_bk(N_slp)
+         integer IB1(9),IB2(9),iex,igx,nsl       
+         real(8) IVB_bk(nsl)
 
          IVB_bk(:)=fem_bk(iex,igx,:)
 
@@ -1261,7 +1261,7 @@ c
      &                          call sub_sup_effect(iex,igx,
      &                          IB1,IB2,IVB_cl,IVB_m,IVB_kw)
             if(Iwkcoup_bk/=0)
-     &                          call sub_bk_effect(iex,igx,
+     &                          call sub_bk_effect(iex,igx,Nslp_mx,
      &                          IB1,IB2,IVB_bk)
             return
          endsubroutine
