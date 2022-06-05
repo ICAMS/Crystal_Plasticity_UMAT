@@ -692,9 +692,9 @@ c +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       module mod_Austenite
          implicit none
          integer,parameter:: N_slip = 12
-         real(8),parameter:: c11    = 265.5d3! 255.7d3
-         real(8),parameter:: c12    = 111.1d3!118.4d3
-         real(8),parameter:: c44    = 77.2d3!85.2d3 ! c44=2*(c11-c12) iso
+         real(8),parameter:: c11    =255.7d3! 255.7d3
+         real(8),parameter:: c12    = 118.4d3!118.4d3
+         real(8),parameter:: c44    = 85.2d3!85.2d3 ! c44=2*(c11-c12) iso
          real(8),parameter:: shrt0  = 1.d-3
          real(8),parameter:: Qact   = 200.d3
          real(8),parameter:: Tempe  = 294   !kelvin
@@ -809,14 +809,14 @@ c        c----------------------------c
             implicit none
             integer Nslp_mx,Nslp
             real(8) STFei26(6,6)
-            real(8) smdMi(Nslp_mx,3,3) 
-            real(8) smdSMi(Nslp_mx,3,3) 
-            real(8) smdAMi(Nslp_mx,3,3) 
-            real(8) smdVi1(Nslp_mx,6) 
-            real(8) smdVi2(Nslp_mx,6) 
-            real(8) vd_slp(Nslp_mx,3) 
-            real(8) vl_slp(Nslp_mx,3) 
-            real(8) vn_slp(Nslp_mx,3) 
+            real(8) smdMi(Nslp_mx,3,3)
+            real(8) smdSMi(Nslp_mx,3,3)
+            real(8) smdAMi(Nslp_mx,3,3)
+            real(8) smdVi1(Nslp_mx,6)
+            real(8) smdVi2(Nslp_mx,6)
+            real(8) vd_slp(Nslp_mx,3)
+            real(8) vl_slp(Nslp_mx,3)
+            real(8) vn_slp(Nslp_mx,3)
             real(8) refv_pk2i,refv_IVB
             real(8) IVB_ini(Nslp_mx)
             Nslp               = N_slip
@@ -831,7 +831,7 @@ c        c----------------------------c
             vn_slp(1:Nslp,:  ) = Nvct
             refv_pk2i          = c44*1.d-6
             refv_IVB           = c44*1.d-6
-            IVB_ini(1:Nslp)    = crss0 
+            IVB_ini(1:Nslp)    = crss0
             return
          endsubroutine
 
@@ -898,12 +898,12 @@ c--------evolution rate, derivative of evolution rate w.r.t. pk2i,IVB
             do js=1,N_slip
                x1=1-IVB(js)/crsss
                dIVBdt(is)=dIVBdt(is) + HMij(is,js)
-     &         *hdrt0*dabs(dgmdt(js))*x1**pwhd 
+     &         *hdrt0*dabs(dgmdt(js))*x1**pwhd
                if(Iexp_loc/=1)then
                   ddIVBdt_ddgmdt(is,js)=HMij(is,js)*hdrt0
-     &            *dsign(1.d0,tau(js))*x1**pwhd 
+     &            *dsign(1.d0,tau(js))*x1**pwhd
                   ddIVBdt_dIVB(is,js)=HMij(is,js)*hdrt0
-     &            *ddgmdt_dIVB(js)*dsign(1.d0,tau(js))*x1**pwhd 
+     &            *ddgmdt_dIVB(js)*dsign(1.d0,tau(js))*x1**pwhd
      &            -HMij(is,js)*hdrt0*dabs(dgmdt(js))
      &            *x1**(pwhd-1)*pwhd/crsss
                endif
@@ -913,6 +913,8 @@ c--------evolution rate, derivative of evolution rate w.r.t. pk2i,IVB
             return
          endsubroutine
       endmodule mod_Austenite
+
+
 
 
 c +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

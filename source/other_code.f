@@ -401,13 +401,16 @@ c100   format(48e20.8)
 
 
 C******************************************** 
-      subroutine gaussj(A,n,B,ising)
+      subroutine gaussj(Amat,n,Bmat,ising)
 C******************************************** 
       implicit none
-      integer   n,ising
+      integer, intent(in) :: n
+      integer, intent(out) :: ising
+      real(8), intent(in) :: Amat(n,n)
+      real(8), intent(out) ::  Bmat(n,n)
       integer   i,icol,irow,j,k,l,ll,i1,i2
       integer   indxc(n),indxr(n),ipiv(n)
-      real(8)   A(n,n),B(n,n),c(n,n),vx(n)
+      real(8)   vx(n)
       real(8)   big,dum,pivinv,x1,x2,x3
 c-------------------------------------------
 c      write(6,*) 'coming to jd'
@@ -415,7 +418,7 @@ c      call pm(A,3,3)
 c      call flush(6)
 
       ising=0
-      C=A
+      Bmat=Amat
       ipiv=0
 c-----loop for the pivot procedures, from 1 to n
       do i=1,n
@@ -423,8 +426,8 @@ c-----loop for the pivot procedures, from 1 to n
          do j=1,n
          do k=1,n
             if(ipiv(j).ne.1 .and. ipiv(k)==0)then
-               if(dabs(a(j,k)).ge.big)then
-                  big=dabs(a(j,k))
+               if(dabs(Bmat(j,k)).ge.big)then
+                  big=dabs(Bmat(j,k))
                   irow=j
                   icol=k
                endif
@@ -439,13 +442,13 @@ c              call flush(6)
          enddo
          enddo
 c--------check whether the pivot element is zero or not
-         if(a(irow,icol)==0.d0)then
+         if(big.le.1.0d-10)then
 c	      print*,'sigular matrix in gauss_jordan'
 c	      print*,'indices is:', irow,icol
 c           write(6,*)'sigular matrix in gauss_jordan'
 c           write(6,*)'indices is:', irow,icol
 c           call flush(6)
-            ising=1
+            ising=2
             return
          endif
 c-------------------------------------------------------
@@ -460,19 +463,19 @@ c--------record the row and collum number for ith pivot element
          indxc(i)=icol
 c--------change pivot element to diagonal position
          if(irow.ne.icol)then
-            vx=a(irow,:)
-            a(irow,:)=a(icol,:)
-            a(icol,:)=vx
+            vx=Bmat(irow,:)
+            Bmat(irow,:)=Bmat(icol,:)
+            Bmat(icol,:)=vx
          endif
-c--------eliminate the elements besides a(icol,icol)
-         pivinv=1.d0/a(icol,icol)
-         a(icol,icol)=1.d0
-         a(icol,:)=a(icol,:)*pivinv 
+c--------eliminate the elements besides Bmat(icol,icol)
+         pivinv=1.d0/Bmat(icol,icol)
+         Bmat(icol,icol)=1.d0
+         Bmat(icol,:)=Bmat(icol,:)*pivinv 
          do i2=1,n
             if(i2.ne.icol)then
-               dum=a(i2,icol)
-               a(i2,icol)=0.d0
-               a(i2,:)=a(i2,:)-a(icol,:)*dum
+               dum=Bmat(i2,icol)
+               Bmat(i2,icol)=0.d0
+               Bmat(i2,:)=Bmat(i2,:)-Bmat(icol,:)*dum
             endif
          enddo
       enddo
@@ -481,13 +484,11 @@ c-----after maximum pivot strategy elimination
 c-----rearrage the left matrix
       do l=n,1,-1
          if(indxr(l).ne.indxc(l))then
-            vx=a(:,indxr(l))
-            a(:,indxr(l))=a(:,indxc(l))
-            a(:,indxc(l))=vx
+            vx=Bmat(:,indxr(l))
+            Bmat(:,indxr(l))=Bmat(:,indxc(l))
+            Bmat(:,indxc(l))=vx
          endif
       enddo
-      B=A
-      A=C
 
       RETURN
       END

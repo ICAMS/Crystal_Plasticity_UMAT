@@ -5,11 +5,11 @@ c
 c================================================================
       module mod_mesh_grid_size
          implicit none
-         integer, parameter :: Tnel=20000
+         integer, parameter :: Tnel=14000
          integer, parameter :: Tngp=8
-         integer, parameter :: Tnfx=64
-         integer, parameter :: Tnfy=64
-         integer, parameter :: Tnfz=64
+         integer, parameter :: Tnfx=32
+         integer, parameter :: Tnfy=32
+         integer, parameter :: Tnfz=32
          integer, parameter :: Iwkcoup_trip=0  !-->with(1), without(0)
          integer, parameter :: Iwkcoup_grad=0  !-->with(1), without(0)
          integer, parameter :: Iwkcoup_int=0   !-->with(1), without(0)
@@ -792,10 +792,10 @@ c================================================================
          fem_inty(i1,i2,:)=sigR0(13:18)
          fem_intz(i1,i2,:)=sigR0(19:24)
 
-         fem_fx(i1,i2)= 0.126
-         fem_fy(i1,i2)= 0.126
-         fem_fz(i1,i2)= 0.126
-         fem_fpp(i1,i2)=0.62
+         fem_fx(i1,i2)= 0.13
+         fem_fy(i1,i2)= 0.13
+         fem_fz(i1,i2)= 0.13
+         fem_fpp(i1,i2)=0.61
 
          mx33(1,:)=[1.,0.,0.]
          mx33(2,:)=[0.,1.,0.]
@@ -1050,35 +1050,35 @@ c================================================================
 
 c================================================================
 c
-c    weak coupling module: Back stress 
+c    weak coupling module: Back stress
 c
 c================================================================
       module mod_wkcoup_bk
          use mod_mesh_grid_size
-         implicit none 
-         real(8),parameter:: Adir = 810.d0
-         real(8),parameter:: Adyn = 292.d0
-         real(8),parameter:: A1 = 65.d4
-         real(8),parameter:: B1 = 499.d2
-         real(8),parameter:: A2 = 0.d4
-         real(8),parameter:: B2 = 0.d3
-         real(8),parameter:: A3 = 0.d4
+         implicit none
+         real(8),parameter:: Adir = 810.0
+         real(8),parameter:: Adyn = 292.0
+         real(8),parameter:: A1 = 3344.d0
+         real(8),parameter:: B1 = 1462.d0
+         real(8),parameter:: A2 = 3867.d0
+         real(8),parameter:: B2 = 0.d0
+         real(8),parameter:: A3 = 0.d0
          real(8),parameter:: B3 = 0.d0
          real(8),parameter:: M_OW = 8.0d0
-         integer,parameter:: N_slp = 48
+         real(8),parameter:: N_slp = 48
          real(8) fem_bk(Tnel,Tngp,N_slp)
          real(8) fem_bk_ch(Tnel,Tngp,N_slp,3)
          real(8) fem_dbkdt(Tnel,Tngp,N_slp)
          real(8) fem_dbkdt_ch(Tnel,Tngp,N_slp,3)
-         real(8) fem_dgmdt(Tnel,Tngp,N_slp)                               
+         real(8) fem_dgmdt(Tnel,Tngp,N_slp)
       contains
 c================================================================
 c        int: constants and state variable ini
 c================================================================
       subroutine sub_bk_ini
          implicit none
-          
-         fem_bk=0         
+
+         fem_bk=0
          fem_dgmdt=0
          fem_dbkdt=0
          fem_bk_ch=0
@@ -1098,9 +1098,9 @@ c================================================================
 c AFKH
           if (Iwkcoup_bk.eq.1) then
           do i1=1,Tnel
-          do i2=1,Tngp          
+          do i2=1,Tngp
           do is=1,N_slp
-           fem_dbkdt(i1,i2,is) = Adir*fem_dgmdt(i1,i2,is)-    
+           fem_dbkdt(i1,i2,is) = Adir*fem_dgmdt(i1,i2,is)-
      &     Adyn*fem_bk(i1,i2,is)*dabs(fem_dgmdt(i1,i2,is))
 
            fem_bk(i1,i2,is)=fem_bk(i1,i2,is)+fem_dbkdt(i1,i2,is)
@@ -1113,15 +1113,15 @@ c AFKH
 c CHKH
           if (Iwkcoup_bk.eq.2) then
           do i1=1,Tnel
-          do i2=1,Tngp          
+          do i2=1,Tngp
           do is=1,N_slp
-          fem_dbkdt_ch(i1,i2,is,1) = A1*fem_dgmdt(i1,i2,is)-    
+          fem_dbkdt_ch(i1,i2,is,1) = A1*fem_dgmdt(i1,i2,is)-
      &     B1*fem_bk_ch(i1,i2,is,1)*dabs(fem_dgmdt(i1,i2,is))
 
-          fem_dbkdt_ch(i1,i2,is,2) = A2*fem_dgmdt(i1,i2,is)-    
+          fem_dbkdt_ch(i1,i2,is,2) = A2*fem_dgmdt(i1,i2,is)-
      &     B2*fem_bk_ch(i1,i2,is,2)*dabs(fem_dgmdt(i1,i2,is))
 
-          fem_dbkdt_ch(i1,i2,is,3) = A3*fem_dgmdt(i1,i2,is)-    
+          fem_dbkdt_ch(i1,i2,is,3) = A3*fem_dgmdt(i1,i2,is)-
      &     B3*fem_bk_ch(i1,i2,is,3)*dabs(fem_dgmdt(i1,i2,is))
 
           fem_bk_ch(i1,i2,is,1:3)=fem_bk_ch(i1,i2,is,1:3)+
@@ -1137,9 +1137,9 @@ c CHKH
 c OWKH
           if (Iwkcoup_bk.eq.3) then
           do i1=1,Tnel
-          do i2=1,Tngp          
+          do i2=1,Tngp
           do is=1,N_slp
-           fem_dbkdt(i1,i2,is) = Adir*fem_dgmdt(i1,i2,is)-    
+           fem_dbkdt(i1,i2,is) = Adir*fem_dgmdt(i1,i2,is)-
      &     Adyn*(dabs(fem_bk(i1,i2,is))/(Adir/Adyn))**M_OW
      &     *fem_bk(i1,i2,is)*dabs(fem_dgmdt(i1,i2,is))
 
@@ -1151,15 +1151,15 @@ c OWKH
           endif
 
           return
-         endsubroutine 
+         endsubroutine
 
 c================================================================
 c        int: back stress due to Bauschinger effect
 c================================================================
-         subroutine sub_bk_effect(iex,igx,nsl,IB1,IB2,IVB_bk)
+         subroutine sub_bk_effect(iex,igx,IB1,IB2,IVB_bk)
          implicit none
-         integer IB1(9),IB2(9),iex,igx,nsl       
-         real(8) IVB_bk(nsl)
+         integer IB1(9),IB2(9),iex,igx
+         real(8) IVB_bk(N_slp)
 
          IVB_bk(:)=fem_bk(iex,igx,:)
 
@@ -1167,8 +1167,6 @@ c================================================================
          endsubroutine
 
       endmodule mod_wkcoup_bk
-
-
 c================================================================
 c
 c    weak coupling module
@@ -1261,10 +1259,9 @@ c
      &                          call sub_sup_effect(iex,igx,
      &                          IB1,IB2,IVB_cl,IVB_m,IVB_kw)
             if(Iwkcoup_bk/=0)
-     &                          call sub_bk_effect(iex,igx,Nslp_mx,
+     &                          call sub_bk_effect(iex,igx,
      &                          IB1,IB2,IVB_bk)
             return
          endsubroutine
 
       endmodule mod_wkcoup
-
