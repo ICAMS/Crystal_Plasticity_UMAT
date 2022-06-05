@@ -28,7 +28,7 @@ V4,3
 ** 
 *Step, name=Step-1, nlgeom=YES, inc=100000000, solver=iterative
 *Static
-0.01, 105.5, 1e-5, 1.
+0.01, 105.5, 1e-5, 0.1
 ** 
 ** BOUNDARY CONDITIONS
 ** 
