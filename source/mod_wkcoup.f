@@ -1056,15 +1056,15 @@ c================================================================
       module mod_wkcoup_bk
          use mod_mesh_grid_size
          implicit none
-         real(8),parameter:: Adir = 810.0
-         real(8),parameter:: Adyn = 292.0
-         real(8),parameter:: A1 = 3344.d0
-         real(8),parameter:: B1 = 1462.d0
-         real(8),parameter:: A2 = 3867.d0
+         real(8),parameter:: Adir = 5.d3
+         real(8),parameter:: Adyn = 1.d2
+         real(8),parameter:: A1 = 65.d4
+         real(8),parameter:: B1 = 499.d2
+         real(8),parameter:: A2 = 0.d0
          real(8),parameter:: B2 = 0.d0
          real(8),parameter:: A3 = 0.d0
          real(8),parameter:: B3 = 0.d0
-         real(8),parameter:: M_OW = 8.0d0
+         real(8),parameter:: M_OW = 1.d1
          real(8),parameter:: N_slp = 48
          real(8) fem_bk(Tnel,Tngp,N_slp)
          real(8) fem_bk_ch(Tnel,Tngp,N_slp,3)
