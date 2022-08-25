@@ -6,10 +6,7 @@ cccccccccccccccccccccccccccccccccccccccccccc
       real(8) det
       real(8) vv(3)
       real(8) Mx(3,3),rm(3,3),um(3,3)
-      real(8) pi,r2g,g2r
-      pi=dacos(-1.d0)
-      r2g=180/pi
-      g2r=pi/180
+
 cccccccccccccccccccccccccccccccccccccccccccc
       ising_1=0
 !      call PDECOMPOSITION(Mx,Um,Rm,ising_1)
@@ -30,17 +27,16 @@ ccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
       real(8) v1(3),v2(3),ang,x1,x2
       real(8) QM1(3,3),QM2(3,3),dQM(3,3)
-      real(8) pi,r2g,g2r
-      pi=dacos(-1.d0)
-      r2g=180/pi
-      g2r=pi/180
+      real(8) pi2
+      pi2 = datan(1.0d0)*2.0d0
+
       call icams_Eang2Q(v1(1),v1(2),v1(3),QM1)
       call icams_Eang2Q(v2(1),v2(2),v2(3),QM2)
       dQM=matmul(QM2,transpose(QM1))
       x1=dQM(1,1)+dQM(2,2)+dQM(3,3)
       x2=(x1-1.d0)/2
       if(dabs(x2)>1.d0)x2=1.d0*sign(1.d0,x2)
-      ang=dabs(pi/2-dasin(x2)) *r2g
+      ang=dabs(pi2-dasin(x2))
       return
       end
 
@@ -87,21 +83,14 @@ c     rotate from X[100],Y[010],Z[001] to v1,v2,v3
 ccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
       real(8) QM(3,3)
-      real(8) p1,p,p2,xp1,xp,xp2
+      real(8) p1,p,p2
       real(8) c1,c,c2,s1,s,s2
-      real(8) pi,r2g,g2r
-      pi=dacos(-1.d0)
-      r2g=180/pi
-      g2r=pi/180
-      xp1=p1*g2r
-      xp =p *g2r
-      xp2=p2*g2r
-      c1=dcos(xp1)
-      s1=dsin(xp1)
-      c =dcos(xp )
-      s =dsin(xp )
-      s2=dsin(xp2)
-      c2=dcos(xp2)
+      c1=dcos(p1)
+      s1=dsin(p1)
+      c =dcos(p )
+      s =dsin(p )
+      s2=dsin(p2)
+      c2=dcos(p2)
       QM(1,1)=+c1*c2-s1*s2*c
       QM(1,2)=+s1*c2+c1*s2*c
       QM(1,3)=+s2*s

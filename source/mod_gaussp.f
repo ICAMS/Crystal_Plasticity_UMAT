@@ -6,7 +6,7 @@
       module mod_gaussp
          implicit none
          integer  Nslp
-         integer, parameter :: Nslp_mx=120            
+         integer, parameter :: Nslp_mx=48      
 c         integer :: Iexp_abq=0  !0: umat,   1: vumat
 c         integer :: Iexp_loc=0  !0: impl,   1: expl, for stress cal
 c         integer :: Imth_add=0  !0: multidcp, 1: adddcp
