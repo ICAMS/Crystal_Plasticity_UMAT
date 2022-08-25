@@ -692,18 +692,18 @@ c +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       module mod_Austenite
          implicit none
          integer,parameter:: N_slip = 12
-         real(8),parameter:: c11    =255.7d3! 255.7d3
-         real(8),parameter:: c12    = 118.4d3!118.4d3
-         real(8),parameter:: c44    = 85.2d3!85.2d3 ! c44=2*(c11-c12) iso
+         real(8),parameter:: c11    = 265.5d3
+         real(8),parameter:: c12    = 111.1d3
+         real(8),parameter:: c44    = 77.2d3     ! c44=2*(c11-c12) iso
          real(8),parameter:: shrt0  = 1.d-3
          real(8),parameter:: Qact   = 200.d3
          real(8),parameter:: Tempe  = 294   !kelvin
          real(8),parameter:: Rg    = 8.314
-         real(8),parameter:: pwfl   = 1200.d0!100.d0
-         real(8),parameter:: pwhd   =0 !2.25d0  
-         real(8),parameter:: crss0  = 180.d0!209.d0
-         real(8),parameter:: crsss  =500.d0!500.d0! 500.d0
-         real(8),parameter:: hdrt0  = 0 !180.d0.  
+         real(8),parameter:: pwfl   = 1250.d0
+         real(8),parameter:: pwhd   = 0   
+         real(8),parameter:: crss0  = 170.d0
+         real(8),parameter:: crsss  = 500.d0
+         real(8),parameter:: hdrt0  = 0 
          real(8),parameter:: c_cpl   = 1.d0
          real(8),parameter:: c_oth   = 1.4d0
          real(8) Mstiff(6,6)
