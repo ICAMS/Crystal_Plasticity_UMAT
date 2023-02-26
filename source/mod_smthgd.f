@@ -230,7 +230,7 @@ c--------check convergence of (R1,I1) in hetergenious material
          enddo
          rsd = rsd/(Nftx*Nfty*Nftz)
 
-         print '(2I5,10e15.5)',Iloop,Nloop,rsd,Crsd
+c         print '(2I5,10e15.5)',Iloop,Nloop,rsd,Crsd
 c         read*
 
          if(rsd < Crsd) goto 102

@@ -9,7 +9,7 @@
          use mod_wkcoup
          implicit none
          integer Icurrent_dt,iNRloop
-         integer :: Nnr_max=200            
+         integer :: Nnr_max=200                     
          real(8) :: toler_NRloop=1.d-10         
       contains
          !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -19,9 +19,8 @@
          !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
          subroutine cal_stress_add(ising)
             implicit none
-            integer, intent(out) :: ising
             integer i,j,k,l,m,n,i1,j1,k1,l1,m1,n1,is,js
-            integer ising_1
+            integer ising_1,ising
             real(8) x1,x2,x3,x4,y1,z1
             real(8) M1_66(6,6),M1_96(9,6),M1_99(9,9)
             real(8) M2_66(6,6),M2_96(9,6),M2_99(9,9),M3_99(9,9)
@@ -79,7 +78,7 @@
             call gaussj(Fg0,3,IFg0,ising_1)
 
             if(ising_1/=0)then
-               write(*,*) 'non ivertable for Fg'
+               write(6,*) 'non ivertable for Fg'
                ising=3  !Fg is non-invertible,stop current time step
                return
             endif
@@ -288,7 +287,7 @@ c               print '(i5,3e14.4)',iNRloop,x1,x2,toler_NRloop
             ising_1=0
             call gaussj(Fp0,3,IFp0,ising_1)
             if(ising_1/=0)then
-               write(*,*) 'non ivertable for IFp0'
+               write(6,*) 'non ivertable for IFp0'
                ising=1  !Fp0 is non-invertible, stop current time step
                return
             endif
@@ -425,6 +424,13 @@ c               print '(i5,3e14.4)',iNRloop,x1,x2,toler_NRloop
             !1   End of newton raphson method, solve cauchy stress    1
             !1--------------------------------------------------------1 
 
+            if (Iwkcoup_bk/=0) then
+             do is=1,Nslp
+              fem_dgmdt(ie,ig,is)=dgmdt(is)
+             enddo
+            endif
+         
+
             if (Ialloy==5) then
 
             do is=1,36
@@ -485,14 +491,15 @@ c               print '(i5,3e14.4)',iNRloop,x1,x2,toler_NRloop
             call icams_conv33to6(egy,ib1,ib2,epsy)
             call icams_conv33to6(egz,ib1,ib2,epsz)
             call icams_conv33to6(egp,ib1,ib2,epsp)
+
+            fem_epsx(ie,ig,:)=epsx
+            fem_epsy(ie,ig,:)=epsy
+            fem_epsz(ie,ig,:)=epsz
+            fem_epsp(ie,ig,:)=epsp
     
             Lp=fx*Lpx+fy*Lpy+fz*Lpz+fpp*Lpp
 
             else
-
-            do is=1,Nslp
-              fem_dgmdt(ie,ig,is)=dgmdt(is)
-            enddo
 
             call icams_conv6to33(pk2i,ib1,ib2,pk2i_M)
 
@@ -520,7 +527,7 @@ c               print '(i5,3e14.4)',iNRloop,x1,x2,toler_NRloop
             ising_1=0
             call gaussj(Fp,3,iFp,ising_1)
             if(ising_1/=0)then
-               write(*,*) 'non ivertable for Fp'
+               write(6,*) 'non ivertable for Fp'
                ising=2  !Fp is non-invertible,stop current time step
                return
             endif
@@ -534,7 +541,7 @@ c               print '(i5,3e14.4)',iNRloop,x1,x2,toler_NRloop
             ising_1=0
             call gaussj(Fg,3,IFg,ising_1)
             if(ising_1/=0)then
-               write(*,*) 'non ivertable for Fg'
+               write(6,*) 'non ivertable for Fg'
                ising=3  !Fp is non-invertible,stop current time step
                return
             endif
@@ -572,7 +579,7 @@ c            read*
 
          !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
          !+                                                                                  +
-         !+   THIS ROUTINE calculates tangent matrix for Newton Raphson algorithms           +
+         !+   THIS ROUTINE calculates tangent matrix for newton raphson algoriths            +
          !+                                                                                  +
          !+   #1: dG1_dpk2i,dG1_dIVB,IdG1_dpk2i                                              +
          !+   #2: dG2_dpk2i,dG2_dIVB,IdG2_dIVB                                               +
@@ -581,9 +588,8 @@ c            read*
          !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
          subroutine cal_NRmatrix(ising)
             implicit none
-            integer, intent(out) :: ising
             integer i,j,k,l,m,n,i1,j1,k1,l1,m1,n1,is,js
-            integer ising_1
+            integer ising_1,ising
             real(8) x1,y1,z1
             real(8) M1_66(6,6),M1_96(9,6),M1_99(9,9)
             real(8) M2_66(6,6),M2_96(9,6),M2_99(9,9)
@@ -600,13 +606,9 @@ c            read*
             enddo
 
             ising_1=0
-            call gaussj(dGv1_dpk2i,6,IdGv1_dpk2i,ising_1)
+            call gaussj(dGv1_dpk2i,6,idGv1_dpk2i,ising_1)
             if(ising_1/=0)then
-               write(*,*) 'non ivertable for dGv1_dpk2i'
-               write(*,*) ising_1
-               write(*,*) dGv1_dpk2i
-               write(*,*) 'Matrix returned'
-               write(*,*) IdGv1_dpk2i
+               write(6,*) 'non ivertable for dGv1_dpk2i'
                ising=41  !dGv1_dpk2i non-invertable,stop
                return
             endif
@@ -621,7 +623,7 @@ c            read*
             call gaussj( dGv2_dIVB(1:Nslp,1:Nslp),Nslp,
      &                  idGv2_dIVB(1:Nslp,1:Nslp),ising_1)
             if(ising_1/=0)then
-               write(*,*) 'non ivertable for dGv2_dIVB'
+               write(6,*) 'non ivertable for dGv2_dIVB'
                ising=42  !dGv2_dIVB non-invertable,stop
                return
             endif
@@ -637,7 +639,7 @@ c            read*
             ising_1=0
             call gaussj(eqM66Gv1,6,IeqM66Gv1,ising_1)
             if(ising_1/=0)then
-               write(*,*) 'non ivertable for eqM66Gv1'
+               write(6,*) 'non ivertable for eqM66Gv1'
                ising=43  !eqM66Gv1 non-invertable,stop
                return
             endif
@@ -649,7 +651,7 @@ c            read*
             call gaussj( eqMnnGv2(1:Nslp,1:Nslp),Nslp,
      &                  IeqMnnGv2(1:Nslp,1:Nslp),ising_1)
             if(ising_1/=0)then
-               write(*,*) 'non ivertable for eqMnnGv2'
+               write(6,*) 'non ivertable for eqMnnGv2'
                ising=44  !eqMnnGv2 non-invertable,stop
                return
             endif

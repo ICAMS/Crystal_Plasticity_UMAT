@@ -1,6 +1,29 @@
 c +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c +                                                                         +
-c +   Other subroutine is here included                                     +
+c +   Define global values: Material and model parameters                   +
+c +                                                                         +
+c +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+      MODULE globalvalue
+      IMPLICIT NONE
+
+      CHARACTER(len=12) :: abaqus = 'abq6142'
+
+      ! Parameters and constants                     ! UNIT         Explanation
+C     -------------------------------------------------------------------------------                                                                                                                  
+      REAL(8), PARAMETER :: R_gas     = 8.314d0      ! Nm/K/mol     Gas constant                        
+      REAL(8), PARAMETER :: NAvg      = 6.022141d23  ! 1/mol        Avogardo Number
+      REAL(8)            :: temp_cur                 ! K            current temperature
+c     temperature-dependent material parameters for austenite
+      REAL(8)            :: c11_gl, c12_gl, c44_gl   ! MPa          elast. constants
+      REAL(8)            :: tau0_gl                  ! MPa          CRSS
+      REAL(8)            :: Adir_gl                  ! MPa          kin. hard. parameter
+      
+      END MODULE globalvalue
+      
+c +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+c +                                                                         +
+c +   Include other subroutines                                             +
 c +                                                                         +
 c +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       include "mod_gaussp.f"            
@@ -21,6 +44,7 @@ c +             4 beginning of restart                                      +
 c +                                                                         +
 c +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       subroutine uexternaldb(lop,lrestart,time,dtime,kstep,kinc)
+      use globalvalue
       use mod_gaussp
       use mod_wkcoup
       use mod_alloys
@@ -32,6 +56,7 @@ c +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
       if(lop==0)then   !ini
          print*, kinc,dtime,time(2), 'First call, initialization...'
+         temp_cur= 0.d0  ! Can initial temp be queried in uexternaldb???
          call mod_gspt_ini
          call mod_alls_ini(IB1,IB2)       
          call mod_wkcp_ini(IB1,IB2)
@@ -39,11 +64,11 @@ c +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       endif
  
       if(lop==1)then
-         print*, kinc,dtime,time(2), 'start of time step'
+         print*, kinc,dtime,time(2),temp_cur, 'start of time step'
       endif
 
       if(lop==2)then
-         print*, kinc,dtime,time(2), 'call wkcoup_evo subroutine'
+         print*, kinc,dtime,time(2),temp_cur, 'call wkcoup_evo subroutine'
          call wkcoup_evolution(dtime)
       endif
 
@@ -70,10 +95,38 @@ c +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
      &                dfgrd0,dfgrd1,
      &                noel,npt,layer,kspt,kstep,kinc)
 c---------------------------------------------------------------------------
+C=======================================================================
+C    VARIABLES
+C ----------------------------------------------------------------------
+C=======================================================================
+C
+C    STATE VARIABLES
+C ----------------------------------------------------------------------
+C   SDV01-03   : eang0 (rad)
+C   SDV05-10   : cs0
+C   SDV11-16   : pk2i0
+C   SDV17-22   : pk2i0_gnd
+C   SDV23-31   : Fe0
+C   SDV32-40   : Fp0
+C   SDV41-149  : IVB0, IVB_bk
+C   SDV150-155 : elastic strain Ee
+C   SDV156-161 : plastic strain in crystal coordinates
+C   SDV162-164 : C11, C12, C44 (MPa); temperature-dependent elastic constants
+C   SDV165     : tau0 (MPa); temperature-dependent critical resolved shear stress
+C   SDV166     : Adir (MPa); temperature-dependent parameter for isotropic hardening
+C
+C    Material Properties
+C ----------------------------------------------------------------------
+C    PROPS(1)     : Material identifier -> ialloys
+C    PROPS(2...4) : Euler angles (in rad) of grain orientation -> eang00
+C 
+C ----------------------------------------------------------------------
+C=======================================================================
+      use globalvalue
       use mod_stress
       use mod_wkcoup
-
-c      include 'aba_param.inc'
+      use mod_gaussp
+      
       implicit none
 
       character*80  cmname !user defined material name
@@ -91,7 +144,7 @@ c      include 'aba_param.inc'
 c---------------------------------------------------------------------------
       real(8) drpldt    !jacobian drpl_dt
       real(8) dtime     !time increment dt
-      real(8) temp      !temperature at t0
+      real(8) temp      !temperature
       real(8) dtemp     !increment of temperature.
       real(8) celent    !characteristic element length
       real(8) sse       !specific elastic strain energy
@@ -121,21 +174,23 @@ c---------------------------------------------------------------------------
       integer i,j,k,ii,jj,is,icomp
       real(8) x1,x2,x3,xx
       real(8) mx33_1(3,3)
-      real(8) phi1,phi,phi2,Qm(3,3),el_st(3,3)
-      real(8) intLp(3,3)
-c
-      ialloy =int(props(1))
-      eang00(1:3)=props(2:4)
+      real(8) phi1,phi,phi2,Qm(3,3)
+      real(8) intLp(3,3),el_st(3,3)
+c----------------------------------------------------------------------------
+      ialloy = int(props(1))
+      eang00(1:3) = props(2:4)
       ie=noel
       ig=npt
       dt1=dtime
       Fg0=dfgrd0
       Fg =dfgrd1
-
       if (ie.gt.Tnel) then
-      print*, 'too many elements, change Tnel'
-      stop
+        print*, 'too many elements, change Tnel'
+        stop
       endif
+
+      temp_cur = temp  ! set global variable to current temperature
+      call set_param_temp(temp)
 c
 c---------------------------------------------------------c
 c     state initialization values for ABQUS statev        c
@@ -145,7 +200,7 @@ c---------------------------------------------------------c
      &              smdMi,smdSMi,smdAMi,smdVi1,smdVi2,
      &              vd_slp,vl_slp,vn_slp,
      &              refv_pk2i,refv_IVB,IVB_ini)
-      if(time(2)==0)then
+      if(time(2) < 1.d-8)then
          call icams_eang2Q(eang00(1),eang00(2),eang00(3),mx33_1)
          statev( 1: 3)=eang00(1:3)               !!-->01-03 eang0
          statev( 5:10)=0                         !!-->05-10 cs0
@@ -220,6 +275,9 @@ c------------------------------------------------c
          call cal_stress_mul(ising)
       endif  
 
+c------------------------------------------------c
+c     output to ABAQUS statev                    c
+c------------------------------------------------c
       el_st = (matmul(transpose(Fe),Fe))/2
       ! elastic strain Ee-SDV150 to 155
       statev(150) = el_st(1,1)-0.5
@@ -237,10 +295,14 @@ c------------------------------------------------c
       statev(159)=statev(159)+intLp(1,2)
       statev(160)=statev(160)+intLp(1,3)
       statev(161)=statev(161)+intLp(2,3) 
-      	  
-c------------------------------------------------c
-c     output to ABAQUS statev                    c
-c------------------------------------------------c
+      
+      ! temperature-dependent material parameters
+      statev(162) = c11_gl
+      statev(163) = c12_gl
+      statev(164) = c44_gl
+      statev(165) = tau0_gl
+      statev(166) = Adir_gl
+      
       if(ising/=0)then
          pnewdt=0.5d0
          return
@@ -259,9 +321,14 @@ c------------------------------------------------c
          icomp=40
          do is=1,Nslp                         !!
             icomp=icomp+1                     !! 
-            statev(icomp)=IVB(is)             !!-->41-  IVB
+            statev(icomp)=IVB(is)             !!-->41-41+NSLP  IVB
          enddo                                !!
-c--------------------------------------------------------------------- 
+         do is=1,48
+            icomp=icomp+1
+            statev(icomp)=IVB_bk(is)         !! --> 41+NSLP-41+NSLP+48 IVB_bk
+         enddo
+      	  
+c---------------------------------------------------------------------
          if(Iwkcoup_grad/=0)then
             if(Icall_ieig_grad(noel,npt)==0)then
                Icall_ieig_grad(noel,npt)     = 1
@@ -283,6 +350,3 @@ c---------------------------------------------------------------------
 
       return
       end
-
-
-

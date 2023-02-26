@@ -6,7 +6,7 @@
       module mod_gaussp
          implicit none
          integer  Nslp
-         integer, parameter :: Nslp_mx=48      
+         integer, parameter :: Nslp_mx=120            
 c         integer :: Iexp_abq=0  !0: umat,   1: vumat
 c         integer :: Iexp_loc=0  !0: impl,   1: expl, for stress cal
 c         integer :: Imth_add=0  !0: multidcp, 1: adddcp
@@ -84,7 +84,11 @@ c         integer :: Imth_add=0  !0: multidcp, 1: adddcp
 !---------------------------------------------------------------c
          real(8) Ftrp(3,3)
          real(8) IFtrp(3,3)
-         real(8) IVB_trp(Nslp_mx),IVB_wcp(Nslp_mx),IVB_bk(Nslp_mx)
+         real(8) IVB_trp(Nslp_mx),IVB_wcp(Nslp_mx)
+!---------------------------------------------------------------c
+!        Kinematic hardening effect                            c
+!---------------------------------------------------------------c
+         real(8) IVB_bk(Nslp_mx)
 !---------------------------------------------------------------c
 !        climb, matrix dislocation and KW effect                c
 !---------------------------------------------------------------c

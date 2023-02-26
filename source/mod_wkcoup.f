@@ -5,13 +5,13 @@ c
 c================================================================
       module mod_mesh_grid_size
          implicit none
-         integer, parameter :: Tnel=14000
+         integer, parameter :: Tnel=27000
          integer, parameter :: Tngp=8
-         integer, parameter :: Tnfx=32
-         integer, parameter :: Tnfy=32
-         integer, parameter :: Tnfz=32
-         integer, parameter :: Iwkcoup_trip=0  !-->with(1), without(0)
-         integer, parameter :: Iwkcoup_grad=0  !-->with(1), without(0)
+         integer, parameter :: Tnfx=64
+         integer, parameter :: Tnfy=64
+         integer, parameter :: Tnfz=64
+         integer, parameter :: Iwkcoup_trip=0  !-->with(1), without(0) 
+         integer, parameter :: Iwkcoup_grad=0  !-->with(1), without(0) 
          integer, parameter :: Iwkcoup_int=0   !-->with(1), without(0)
          integer, parameter :: Iwkcoup_sup=0   !-->with(1), without(0)
          integer, parameter :: Iwkcoup_bk=3    !-->with(1)AFKH, with(2)CHKH, with(3)OWKH, without(0)
@@ -28,12 +28,12 @@ c================================================================
          use mod_mesh_grid_size
          implicit none
          integer, parameter :: I_gnd_iso = 1       !-->with(1),without(0)
-         integer, parameter :: I_gnd_kin = 1       !-->with(1),without(0)
+         integer, parameter :: I_gnd_kin = 1       !-->with(1),without(0)  
          real(8), parameter :: C_taui    = 0.01    !-->Taylor hardening parameter
          real(8), parameter :: L_size    = 1.0d-9  !-->unit m, length scale
          real(8), parameter :: C_unit    = 1.0d-6  !-->unit m, mesh
-         real(8), parameter :: B_lattice = 2.5d-10 !-->unit m, Burgers vector
-         real(8), parameter :: CD_smooth = 3.d-15
+         real(8), parameter :: B_lattice = 2.5d-10 !-->unit m, Burgers vector 
+         real(8), parameter :: CD_smooth = 3.d-15  
 c--------strain gradient
          real(8) fem_Fp0        (Tnel,Tngp,3,3)
          real(8) fem_dFp        (Tnel,Tngp,3,3)
@@ -95,12 +95,12 @@ c================================================================
          CD_parts(2)=CD_parts(1)   ! outside domain, rigid
          CD_parts(3)=CD_parts(1)   ! outside domain, free
          CD_ref = max( CD_parts(1),CD_parts(2),CD_parts(3) )
-
-         x_min =+1.d50
+         
+         x_min =+1.d50  
          x_max =-1.d50
-         y_min =+1.d50
+         y_min =+1.d50  
          y_max =-1.d50
-         z_min =+1.d50
+         z_min =+1.d50  
          z_max =-1.d50
          do i=1,Tnel
          do j=1,Tngp
@@ -178,7 +178,7 @@ c================================================================
                   x_tmp=dsqrt(sum((fem_xyz(i1,i2,:)-[x1,x2,x3])**2))
                   if(x_min>x_tmp)then
                      x_min=x_tmp; iex=i1; igx=i2
-                  endif
+                  endif                
                endif
                enddo
                enddo
@@ -190,9 +190,9 @@ c================================================================
                if( x3<BOX_z(2) ) idx=6
                if( x3>BOX_z(3) ) idx=7
                fft_Inf(ix,iy,iz,1:3)=[iex,igx,idx]
-               fft_CD(ix,iy,iz)=CD_ref
-            enddo
-            enddo
+               fft_CD(ix,iy,iz)=CD_ref 
+            enddo         
+            enddo         
             enddo
 
             do i1=1,Tnel
@@ -209,7 +209,7 @@ c================================================================
                      x_tmp=dsqrt(sum((fem_xyz(i1,i2,:)-[x1,x2,x3])**2))
                      if(x_min>x_tmp)then
                         x_min=x_tmp; fem_Inf(i1,i2,2:4)=[ix,iy,iz]
-                     endif
+                     endif                
                   endif
                enddo
                enddo
@@ -226,12 +226,12 @@ c================================================================
          fem_dFpp_2gd=0
          call cal_Fp_grad(Tnel,Tngp,          ! FEM mesh size
      &                    Tnfx,Tnfy,Tnfz,     ! FFT grid size
-     &                    CD_ref,             ! reference Smooth fct
+     &                    CD_ref,             ! reference Smooth fct 
      &                    detx,dety,detz,     ! FFT grid increment
-     &                    fft_CD,             ! Smooth factor
+     &                    fft_CD,             ! Smooth factor 
      &                    fft_xyz,            ! FFT grid coordinates
      &                    fft_Fqc,            ! FFT grid freuencies
-     &                    fft_Inf,            ! FFT-->FEM connection
+     &                    fft_Inf,            ! FFT-->FEM connection 
      &                    fem_Inf,            ! FEM-->FFT connection
      &                    fem_xyz,            ! FEM gp coordinates
      &                    fem_dFp,            ! dFp
@@ -259,7 +259,7 @@ c================================================================
 c
             real(8) Rho_gnd(Nslp_mx)
             real(8) IVB_gnd(Nslp_mx)
-            real(8) pk2i_gnd(6)
+            real(8) pk2i_gnd(6)            
 c
             integer i,j,k,m,n,is
             integer i1,i2,i3,i4,i5,i6
@@ -276,8 +276,8 @@ c
 c
             IDT33=0
             do i=1,3
-               IDT33(i,i)=1
-            enddo
+               IDT33(i,i)=1                           
+            enddo         
             IDT333=0
             IDT333(1,2,3)=+1
             IDT333(1,3,2)=-1
@@ -290,10 +290,10 @@ c
             IVB_gnd=0
             pk2i_gnd=0
 c
-            Fp0      = fem_Fp0       (iex,igx,:,:    )
-            dFpp     = fem_dFpp      (iex,igx,:,:    )
-            dFpp_1gd = fem_dFpp_1gd  (iex,igx,:,:,:  )
-            dFpp_2gd = fem_dFpp_2gd  (iex,igx,:,:,:,:)
+            Fp0      = fem_Fp0       (iex,igx,:,:    ) 
+            dFpp     = fem_dFpp      (iex,igx,:,:    ) 
+            dFpp_1gd = fem_dFpp_1gd  (iex,igx,:,:,:  ) 
+            dFpp_2gd = fem_dFpp_2gd  (iex,igx,:,:,:,:) 
             Fp=matmul(dFpp,Fp0)
 
 c-----------elastic constants
@@ -324,18 +324,18 @@ c-----------passing stress due to strain gradient (MPa)
             IVB_gnd=0
             do is=1,Nslp
                x1=dabs(sum(Rho_gnd(1:Nslp)))
-               x2=Xmu*B_lattice*dsqrt(x1)*C_taui
+               x2=Xmu*B_lattice*dsqrt(x1)*C_taui 
                IVB_gnd(is)=x2*I_gnd_iso
             enddo
 
 c-----------Internal stress due to strain gradient (1/mm^2)
             pvct=0
-            sm_R_gnd=0
+            sm_R_gnd=0            
             do i=1,3
             do j=1,3
                if(i/=j)then
-                  tvct = IDT33(i,:)
-                  gvct = IDT33(j,:)
+                  tvct = IDT33(i,:)               
+                  gvct = IDT33(j,:)               
                   pvct1 = gvct*L_size - tvct*L_size/2
                   pvct2 = gvct*L_size + tvct*L_size/2
                   bvct=0
@@ -356,7 +356,7 @@ c-----------Internal stress due to strain gradient (1/mm^2)
                   smij=0
                   call stress_dislocation
      &            (pvct1,pvct2,tvct,bvct,Xmu,Xnu,pvct,smij)
-                  sm_R_gnd = sm_R_gnd + smij
+                  sm_R_gnd = sm_R_gnd + smij            
                endif
             enddo
             enddo
@@ -411,7 +411,7 @@ c================================================================
          subroutine sub_trip_ini(IB1,IB2)
             implicit none
             integer IB1(9),IB2(9)
-c
+c            
             integer i,j,k,l,m,i1,i2,i3,i4,ising,j1,j2,j3,j4
             integer k1,k2,k3,k4,ic1,ic2,iex,igx,ip,np,is,js
             real(8) M2X3_1(3,3),x1,x2,x3,vx3_1(3),vx3_2(3),vx3_3(3)
@@ -423,7 +423,7 @@ c
             IDT33(1,1)=1.d0
             IDT33(2,2)=1.d0
             IDT33(3,3)=1.d0
-
+            
             x1 = B_bcc/B_fcc
             x2 = 10.26d0/180*dacos(-1.d0)
 
@@ -471,13 +471,13 @@ c
             Msmd(11,:,:) = matmul(Rm_trp(2,:,:),Bm_trp(3,:,:))-IDT33
             Msmd(12,:,:) = matmul(Rm_trp(5,:,:),Bm_trp(3,:,:))-IDT33
 
-            do is=1,NTtrp
+            do is=1,NTtrp      
                do i=1,9
                   vx9(i)=Msmd(is,IB1(i),IB2(i))
                enddo
                V2smd(is,1:3)=vx9(1:3)
                V2smd(is,4:6)=vx9(4:6)+vx9(7:9)
-            enddo
+            enddo                
 
             Pm_fcc_twin( 1,:) = [ 0,-1,-1,  0, 0, 0,  0, 0, 0,  0, 0, 0]
             Pm_fcc_twin( 2,:) = [+1, 0,-1,  0, 0, 0,  0, 0, 0,  0, 0, 0]
@@ -528,7 +528,7 @@ c================================================================
             fem_Vtrp0_e=fem_Vtrp_e
             fem_Vtrp0_s=fem_Vtrp_s
             return
-         endsubroutine
+         endsubroutine 
 
 c================================================================
 c        grad: additional eigendeformation and hardening due to trip
@@ -544,7 +544,7 @@ c
             real(8) Ftrp(3,3)
             real(8) IFtrp(3,3)
             real(8) IVB_trp(Nslp_mx)
-c
+c            
             real(8) Vtrp(Nslp_mx)
             real(8) Vtrp_e(Nslp_mx)
             real(8) Vtrp_s(Nslp_mx)
@@ -582,7 +582,7 @@ c
             real(8), parameter :: c_pbmb0 = 1.d-1   !==> PB mobility
             real(8), parameter :: c_hard  = 2.d3    !==> hardening coefficient of trip
             real(8), parameter :: B       = 5.0d0   !==> fitting parameter speed
-            real(8), parameter :: R       = 8.314d0 !==> gas constant
+            real(8), parameter :: R       = 8.314d0 !==> gas constant   
             real(8) c_bken                             !==> Bulk energy difference per volume, MPa
             real(8) c_pbmb	                           !==> transformation speed
             real(8) Ms_trp, T0_trp, G_crit, G_chem
@@ -603,7 +603,7 @@ c
 c
             Xmu=STFei26(4,4)
             Xnu=0.3
-c
+c            
             XVgam  = fem_gm0(iex,igx,1:NStrp)
             XVcs   = fem_cs0(iex,igx,:)
             XMfe   = fem_Fe0(iex,igx,:,:)
@@ -618,7 +618,7 @@ c
             Vtrp0_s(1:NTtrp) = fem_Vtrp0_s(iex,igx,1:NTtrp)  !==> stress induced trip
             TVtrp0  = sum(Vtrp0(1:NTtrp))
             if(TVtrp0>1.d0) TVtrp0=1.d0
-
+               
 c-----------------------------------------------------------------------
             Ms_trp = 273.15d0+
      &      (539.d0-423.d0*wp_C-30.4d0*wp_Mn-7.5d0*wp_Si+30d0*wp_Al)
@@ -628,7 +628,7 @@ c-----------------------------------------------------------------------
             c_bken =-G_chem
             c_pbmb = c_pbmb0*dexp(B*7.0*G_chem/(R*T_akt))
 c-----------------------------------------------------------------------
-
+         
 
 c-----------Shear band intersection induced martensite nucleation
             do is=1,NTtrp
@@ -642,12 +642,12 @@ c-----------Shear band intersection induced martensite nucleation
                   x3=min(dabs(XVtwin(i)),dabs(XVtwin(j)))/gam_crt
                else
                   x3=0
-               endif
+               endif               
 !               Vtrp_e(is)=Vtrp0_e(is)+c_nucl*(1-TVtrp0)*x3
                Vtrp_e(is)=c_nucl*x3*0.1
                if(Vtrp_e(is)<0) Vtrp_e(is)=0
                if(Vtrp_e(is)>1) Vtrp_e(is)=1
-            enddo
+            enddo         
 
 
 c-----------Stress induced martensite growth
@@ -663,8 +663,8 @@ c-----------Stress induced martensite growth
                   do i=1,3
                   do j=1,3
                      x1=x1 + XMcs(i,j)*xm33_2(j,i)
-                  enddo
-                  enddo
+                  enddo         
+                  enddo         
                   if(x1<0) x1=0
                   Rvf_strs(is) = x1
                enddo
@@ -677,13 +677,13 @@ c-----------Stress induced martensite growth
             !==>Phase boundary effect (double well potential) driving part
             Rvf_psbd=0
             do is=1,NTtrp
-               Rvf_psbd(is) = -c_pben *
+               Rvf_psbd(is) = -c_pben * 
      &             (2*Vtrp0(is)-6*Vtrp0(is)**2+4*Vtrp0(is)**3)
             enddo
             !==>finial stress helped growth
             do is=1,NTtrp
                x3 = c_pbmb*(Vtrp0_e(is)+Vf0_trp)
-     &            *(Rvf_strs(is)+Rvf_bken(is)+Rvf_psbd(is))
+     &            *(Rvf_strs(is)+Rvf_bken(is)+Rvf_psbd(is)) 
                Vtrp_s(is)=Vtrp0_s(is)+c_grth*(1-TVtrp0)*x3*dt1
                if(Vtrp_s(is)<0) Vtrp_s(is)=0
                if(Vtrp_s(is)>1) Vtrp_s(is)=1
@@ -715,7 +715,7 @@ c-----------Eigen deformation and its inverse matrix of Trip
 
 c-----------Hardening due to Trip lammelles for slip systems
 
-            IVB_trp(1:Nslp) = B_fcc*Xmu*(dexp(8.8d0*TVtrp0)-1)*c_hard
+            IVB_trp(1:Nslp) = B_fcc*Xmu*(dexp(8.8d0*TVtrp0)-1)*c_hard 
 
 c-----------Save data for material point(iex,igx)
             fem_Vtrp_e(iex,igx,:) = Vtrp_e
@@ -731,26 +731,26 @@ c
 c================================================================
 c
 c    weak coupling module: Interal stress (misfit stress)
-c    output for plastic deformation calculation:pk2i_int(x,y,z,p)
+c    output for plastic deformation calculation:pk2i_int(x,y,z,p) 
 c
 c================================================================
       module mod_wkcoup_int
          use mod_mesh_grid_size
-         implicit none
+         implicit none 
          integer ios
-         character(len=200) :: Path=''
+         character(len=200) :: Path=''                                     
          real(8) epsR0(24),sigR0(24),matrixA(24,24)
          real(8) epsR(24),sigR(24),epsRP(24),sigRP(24)
          real(8) eps_x0(6),eps_y0(6),eps_z0(6),eps_p0(6)
-         real(8) eps_x(6),eps_y(6),eps_z(6),eps_p(6)
+         real(8) eps_x(6),eps_y(6),eps_z(6),eps_p(6)                               
          real(8) fem_intp(Tnel,Tngp,6),fem_intx(Tnel,Tngp,6)
          real(8) fem_inty(Tnel,Tngp,6),fem_intz(Tnel,Tngp,6)
          real(8) fem_fx(Tnel,Tngp),fem_fy(Tnel,Tngp)
          real(8) fem_fz(Tnel,Tngp),fem_fpp(Tnel,Tngp)
          real(8) fem_Fpx(Tnel,Tngp,3,3),fem_Fpy(Tnel,Tngp,3,3)
-         real(8) fem_Fpz(Tnel,Tngp,3,3),fem_Fpx0(Tnel,Tngp,3,3)
+         real(8) fem_Fpz(Tnel,Tngp,3,3),fem_Fpx0(Tnel,Tngp,3,3) 
          real(8) fem_Fpy0(Tnel,Tngp,3,3),fem_Fpz0(Tnel,Tngp,3,3)
-         real(8) fem_Fppp(Tnel,Tngp,3,3),fem_Fppp0(Tnel,Tngp,3,3)
+         real(8) fem_Fppp(Tnel,Tngp,3,3),fem_Fppp0(Tnel,Tngp,3,3) 
          real(8) fem_epsx0(Tnel,Tngp,6),fem_epsy0(Tnel,Tngp,6)
          real(8) fem_epsz0(Tnel,Tngp,6),fem_epsp0(Tnel,Tngp,6)
          real(8) fem_epsx(Tnel,Tngp,6),fem_epsy(Tnel,Tngp,6)
@@ -763,12 +763,12 @@ c================================================================
          implicit none
          integer i,j,i1,i2
          real(8) mx33(3,3)
-
-         eps_p0 = [-0.0015, -0.0015, -0.0015, 0., 0., 0.]
+                   
+         eps_p0 = [-0.0015, -0.0015, -0.0015, 0., 0., 0.]  
          eps_x0 = [0., 0., 0., 0., 0., 0.]
          eps_y0 = [0., 0., 0., 0., 0., 0.]
          eps_z0 = [0., 0., 0., 0., 0., 0.]
-
+         
          epsR0(1:6)=eps_p0(:)
          epsR0(7:12)=eps_x0(:)
          epsR0(13:18)=eps_y0(:)
@@ -779,11 +779,11 @@ c================================================================
 
          do i=1,24
             read (1,'(100e12.3)') (matrixA(i,j),j=1,24)
-         enddo
+         enddo         
 
          sigR0(:)=matmul(matrixA(:,:),epsR0(:))
 
-         close(1)
+         close(1) 
 
          do i1=1,Tnel
          do i2=1,Tngp
@@ -792,10 +792,10 @@ c================================================================
          fem_inty(i1,i2,:)=sigR0(13:18)
          fem_intz(i1,i2,:)=sigR0(19:24)
 
-         fem_fx(i1,i2)= 0.13
-         fem_fy(i1,i2)= 0.13
-         fem_fz(i1,i2)= 0.13
-         fem_fpp(i1,i2)=0.61
+         fem_fx(i1,i2)= 0.126
+         fem_fy(i1,i2)= 0.126
+         fem_fz(i1,i2)= 0.126
+         fem_fpp(i1,i2)=0.62
 
          mx33(1,:)=[1.,0.,0.]
          mx33(2,:)=[0.,1.,0.]
@@ -810,7 +810,7 @@ c================================================================
          fem_epsz0(i1,i2,:)=0
          fem_epsp0(i1,i2,:)=0
          enddo
-         enddo
+         enddo 
 
          return
          endsubroutine
@@ -820,7 +820,7 @@ c        int: state variable evolution
 c================================================================
          subroutine sub_int_evolution
             implicit none
-
+            
             fem_epsx0 = fem_epsx
             fem_epsy0 = fem_epsy
             fem_epsz0 = fem_epsz
@@ -833,7 +833,7 @@ c================================================================
             fem_Fppp0 = fem_Fppp
 
             return
-         endsubroutine
+         endsubroutine 
 
 c================================================================
 c        int: internal stress due to misfit eigenstrain
@@ -843,12 +843,12 @@ c================================================================
      &                          pk2i_intp)
 
          implicit none
-         integer IB1(9),IB2(9),iex,igx
+         integer IB1(9),IB2(9),iex,igx       
          real(8) pk2i_intp(6),pk2i_intx(6)
          real(8) pk2i_inty(6),pk2i_intz(6)
          real(8) fx,fy,fz,fpp
 
-            eps_p(:) = eps_p0(:) + fem_epsp0(iex,igx,:)
+            eps_p(:) = eps_p0(:) + fem_epsp0(iex,igx,:)        
             eps_x(:) = eps_x0(:) + fem_epsx0(iex,igx,:)
             eps_y(:) = eps_y0(:) + fem_epsy0(iex,igx,:)
             eps_z(:) = eps_z0(:) + fem_epsz0(iex,igx,:)
@@ -856,9 +856,9 @@ c================================================================
             epsR(1:6)=eps_p(:)
             epsR(7:12)=eps_x(:)
             epsR(13:18)=eps_y(:)
-            epsR(19:24)=eps_z(:)
+            epsR(19:24)=eps_z(:) 
 
-            sigR(:)=matmul(matrixA(:,:),epsR(:))
+            sigR(:)=matmul(matrixA(:,:),epsR(:)) 
 
          pk2i_intp(:)=sigR(1:6)
          pk2i_intx(:)=sigR(7:12)
@@ -882,7 +882,7 @@ c
 c================================================================
       module mod_wkcoup_sup
          use mod_mesh_grid_size
-         implicit none
+         implicit none                                  
          real(8) fem_gamm0(Tnel,Tngp,48),fem_gamp0(Tnel,Tngp,48)
          real(8) fem_gamm(Tnel,Tngp,48),fem_gamp(Tnel,Tngp,48)
          real(8) fem_cl(Tnel,Tngp,48),fem_mm(Tnel,Tngp,48)
@@ -911,7 +911,7 @@ c================================================================
          fem_kw(i1,i2,:)=0.d0
 
          enddo
-         enddo
+         enddo 
 
          return
          endsubroutine
@@ -926,10 +926,10 @@ c================================================================
             real(8), parameter :: s2   = 8.d0
             real(8), parameter :: a1   = 400.d0
             real(8), parameter :: a2   = 10.d0
-            real(8), parameter :: a3   = 800.d0
-            real(8), parameter :: a4   = 80.d0
+            real(8), parameter :: a3   = 0  !800.d0
+            real(8), parameter :: a4   = 0  !80.d0
             real(8), parameter :: p1   = 0.5d0
-            real(8), parameter :: p2   = 0.4d0
+            real(8), parameter :: p2   = 0  !0.4d0
 
             fem_gamx=0.d0
             fem_gamy=0.d0
@@ -951,7 +951,7 @@ c================================================================
             do is=25,36
               fem_gamz(i1,i2)=fem_gamz(i1,i2)+fem_gamm(i1,i2,is)
             enddo
-
+         
             fem_chttc(i1,i2,37)=fem_gamm(i1,i2,2)+fem_gamm(i1,i2,3)
      &                   +fem_gamm(i1,i2,2+12)+fem_gamm(i1,i2,3+12)
      &                   +fem_gamm(i1,i2,2+24)+fem_gamm(i1,i2,3+24)
@@ -993,7 +993,7 @@ c================================================================
 
             do i1=1,Tnel
             do i2=1,Tngp
-
+ 
             do is=1,12
                  fem_cl(i1,i2,is)=s1*dtanh(s2*fem_gamx(i1,i2))
             enddo
@@ -1005,29 +1005,29 @@ c================================================================
             enddo
             do is=37,48
                  fem_cl(i1,i2,is)=0.d0
-            enddo
+            enddo   
 
             do is=1,36
                fem_mm(i1,i2,is)=0.d0
                fem_kw(i1,i2,is)=0.d0
-            enddo
+            enddo 
 
-            do is=37,48
+            do is=37,48           
             fem_mm(i1,i2,is)=a1*fem_chttc(i1,i2,is)**p1
      &    *dexp(-a2*(fem_gamx(i1,i2)+fem_gamy(i1,i2)+fem_gamz(i1,i2)))
             fem_kw(i1,i2,is)=a3*fem_gamp(i1,i2,is)**p2
      &           *dexp(-a4*fem_gamp(i1,i2,is))
             enddo
-
+             
             enddo
             enddo
-
-
+            
+            
             fem_gamm0=fem_gamm
             fem_gamp0=fem_gamp
 
             return
-         endsubroutine
+         endsubroutine 
 
 c================================================================
 c        sup: IVB_cl, IVB_m, IVB_kw
@@ -1036,7 +1036,7 @@ c================================================================
      &                              IVB_cl,IVB_m,IVB_kw)
 
          implicit none
-         integer IB1(9),IB2(9),iex,igx,is
+         integer IB1(9),IB2(9),iex,igx,is       
          real(8) IVB_cl(48),IVB_m(48),IVB_kw(48)
 
          IVB_cl(:)=fem_cl(iex,igx,:)
@@ -1050,35 +1050,31 @@ c================================================================
 
 c================================================================
 c
-c    weak coupling module: Back stress
+c    weak coupling module: Back stress 
 c
 c================================================================
       module mod_wkcoup_bk
          use mod_mesh_grid_size
-         implicit none
-         real(8),parameter:: Adir = 5.d3
-         real(8),parameter:: Adyn = 1.d2
-         real(8),parameter:: A1 = 65.d4
-         real(8),parameter:: B1 = 499.d2
-         real(8),parameter:: A2 = 0.d0
-         real(8),parameter:: B2 = 0.d0
-         real(8),parameter:: A3 = 0.d0
-         real(8),parameter:: B3 = 0.d0
-         real(8),parameter:: M_OW = 1.d1
-         real(8),parameter:: N_slp = 48
+         use mod_Austenite
+         use GlobalValue
+         implicit none 
+
          real(8) fem_bk(Tnel,Tngp,N_slp)
          real(8) fem_bk_ch(Tnel,Tngp,N_slp,3)
          real(8) fem_dbkdt(Tnel,Tngp,N_slp)
          real(8) fem_dbkdt_ch(Tnel,Tngp,N_slp,3)
          real(8) fem_dgmdt(Tnel,Tngp,N_slp)
-      contains
+                            
+      contains			
+c================================================================	
+
 c================================================================
 c        int: constants and state variable ini
 c================================================================
       subroutine sub_bk_ini
          implicit none
-
-         fem_bk=0
+          
+         fem_bk=0         
          fem_dgmdt=0
          fem_dbkdt=0
          fem_bk_ch=0
@@ -1091,16 +1087,17 @@ c================================================================
 c        int: state variable evolution
 c================================================================
          subroutine sub_bk_evolution(dtime)
-            implicit none
+         implicit none
+       
          integer i1,i2,is
          real(8) dtime
-
+c          print*,'sub_bk_evo', Adir, Adyn, A1
 c AFKH
           if (Iwkcoup_bk.eq.1) then
           do i1=1,Tnel
-          do i2=1,Tngp
+          do i2=1,Tngp          
           do is=1,N_slp
-           fem_dbkdt(i1,i2,is) = Adir*fem_dgmdt(i1,i2,is)-
+           fem_dbkdt(i1,i2,is) = Adir*fem_dgmdt(i1,i2,is)-    
      &     Adyn*fem_bk(i1,i2,is)*dabs(fem_dgmdt(i1,i2,is))
 
            fem_bk(i1,i2,is)=fem_bk(i1,i2,is)+fem_dbkdt(i1,i2,is)
@@ -1113,15 +1110,15 @@ c AFKH
 c CHKH
           if (Iwkcoup_bk.eq.2) then
           do i1=1,Tnel
-          do i2=1,Tngp
+          do i2=1,Tngp          
           do is=1,N_slp
-          fem_dbkdt_ch(i1,i2,is,1) = A1*fem_dgmdt(i1,i2,is)-
+          fem_dbkdt_ch(i1,i2,is,1) = A1*fem_dgmdt(i1,i2,is)-    
      &     B1*fem_bk_ch(i1,i2,is,1)*dabs(fem_dgmdt(i1,i2,is))
 
-          fem_dbkdt_ch(i1,i2,is,2) = A2*fem_dgmdt(i1,i2,is)-
+          fem_dbkdt_ch(i1,i2,is,2) = A2*fem_dgmdt(i1,i2,is)-    
      &     B2*fem_bk_ch(i1,i2,is,2)*dabs(fem_dgmdt(i1,i2,is))
 
-          fem_dbkdt_ch(i1,i2,is,3) = A3*fem_dgmdt(i1,i2,is)-
+          fem_dbkdt_ch(i1,i2,is,3) = A3*fem_dgmdt(i1,i2,is)-    
      &     B3*fem_bk_ch(i1,i2,is,3)*dabs(fem_dgmdt(i1,i2,is))
 
           fem_bk_ch(i1,i2,is,1:3)=fem_bk_ch(i1,i2,is,1:3)+
@@ -1137,9 +1134,9 @@ c CHKH
 c OWKH
           if (Iwkcoup_bk.eq.3) then
           do i1=1,Tnel
-          do i2=1,Tngp
+          do i2=1,Tngp          
           do is=1,N_slp
-           fem_dbkdt(i1,i2,is) = Adir*fem_dgmdt(i1,i2,is)-
+           fem_dbkdt(i1,i2,is) = Adir*fem_dgmdt(i1,i2,is)-    
      &     Adyn*(dabs(fem_bk(i1,i2,is))/(Adir/Adyn))**M_OW
      &     *fem_bk(i1,i2,is)*dabs(fem_dgmdt(i1,i2,is))
 
@@ -1151,14 +1148,14 @@ c OWKH
           endif
 
           return
-         endsubroutine
+         endsubroutine 
 
 c================================================================
 c        int: back stress due to Bauschinger effect
 c================================================================
          subroutine sub_bk_effect(iex,igx,IB1,IB2,IVB_bk)
          implicit none
-         integer IB1(9),IB2(9),iex,igx
+         integer IB1(9),IB2(9),iex,igx       
          real(8) IVB_bk(N_slp)
 
          IVB_bk(:)=fem_bk(iex,igx,:)
@@ -1244,24 +1241,30 @@ c
      &                          Nslp_mx,Nslp,STFei26,
      &                          vd_slp,vl_slp,vn_slp,
      &                          Rho_gnd, IVB_gnd, pk2i_gnd)
-
-            if(Iwkcoup_trip/=0.and.Ialloy==4)
+     
+            if(Iwkcoup_trip/=0.and.Ialloy==4) 
      &                          call sub_trip_effect(iex,igx,
      &                          IB1,IB2,Nslp_mx,Nslp,STFei26,dt1,
      &                          Ftrp, IFtrp, IVB_trp)
 
-            if(Iwkcoup_int/=0.and.Ialloy==5)
+            if(Iwkcoup_int/=0.and.Ialloy==5) 
      &                          call sub_int_effect(iex,igx,
      &                          IB1,IB2,fx,fy,fz,fpp,
      &                          pk2i_intx, pk2i_inty, pk2i_intz,
      &                          pk2i_intp)
-            if(Iwkcoup_sup/=0.and.Ialloy==5)
+            if(Iwkcoup_sup/=0.and.Ialloy==5) 
      &                          call sub_sup_effect(iex,igx,
      &                          IB1,IB2,IVB_cl,IVB_m,IVB_kw)
-            if(Iwkcoup_bk/=0)
+            if(Iwkcoup_bk/=0) 
      &                          call sub_bk_effect(iex,igx,
      &                          IB1,IB2,IVB_bk)
             return
          endsubroutine
 
       endmodule mod_wkcoup
+
+
+
+
+
+
