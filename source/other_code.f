@@ -110,11 +110,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccc
       real(8) QM(3,3)
       real(8) phi1,PHI,phi2
       real(8) sqhkl,squvw,sqhk,val
-      real(8) pi,r2g,g2r,Tol
+      real(8) Tol
       Tol=1.d-15
-      pi=dacos(-1.d0)
-      r2g=180/pi
-      g2r=pi/180
+
+
 c---------------------------------------------
 c
 c             v1   v2    v3
@@ -185,88 +184,9 @@ c           phi1=2*pi-dacos(val)
             phi1=-dacos(val)
          endif
       endif
-      phi1=phi1*r2g
-      PHI=PHI*r2g
-      phi2=phi2*r2g
+
       return
       end
-
-
-
-cccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine icams_Q2Eang_old(QM,phi1,PHI,phi2)
-cccccccccccccccccccccccccccccccccccccccccccccccccc
-      implicit none
-      real(8) QM(3,3)
-      real(8) phi1,PHI,phi2,x1,x2,x3
-      real(8) pi,r2g,g2r,Tol
-      Tol=1.d-15
-      pi=dacos(-1.d0)
-      r2g=180/pi
-      g2r=pi/180
-c---------------------------------------------
-c            v1   v2=v3xv1    v3
-c
-c           | u   v2_1    h  |
-c     QM =  | v   v2_2    k  |    
-c           | w   v2_3    l  | 
-c
-c---------------------------------------------
-
-      x1=dsqrt(QM(1,1)**2+QM(2,1)**2+QM(3,1)**2)
-      x2=dsqrt(QM(1,2)**2+QM(2,2)**2+QM(3,2)**2)
-      x3=dsqrt(QM(1,3)**2+QM(2,3)**2+QM(3,3)**2)
-      QM(:,1)=QM(:,1)/x1
-      QM(:,2)=QM(:,2)/x1
-      QM(:,3)=QM(:,3)/x1
-
-      x1=QM(3,3)
-      if(dabs(x1)>1.d0)x2=1.d0*sign(1.d0,x1)
-
-      PHI=dacos(x2)
-
-      if(PHI<Tol)then
-         phi2=0.d0
-
-         x1=QM(1,1)
-         if(dabs(x1)>1.d0)x2=1.d0*sign(1.d0,x1)
-
-         if(QM(1,2)>=0.d0)then
-            phi1=dacos(x2)
-         else
-c           phi1=2*pi-dacos(val)
-            phi1=-dacos(x2)
-         endif
-      else
-
-         x1=QM(2,3)/dsin(PHI)
-         if(dabs(x1)>1.d0)x2=1.d0*sign(1.d0,x1)
-
-         if(QM(1,3)>=0.d0) then
-            phi2=dacos(x2)
-         else
-c           phi2=2*pi-dacos(val)
-            phi2=-dacos(x2)
-         endif
-
-         x1=-QM(3,2)/dsin(PHI)
-         if(dabs(x1)>1.d0)x2=1.d0*sign(1.d0,x1)
-
-         if(QM(3,1) >= 0.d0) then
-            phi1=dacos(x2)
-         else
-c           phi1=2*pi-dacos(val)
-            phi1=-dacos(x2)
-         endif
-      endif
-      phi1=phi1*r2g
-      PHI=PHI*r2g
-      phi2=phi2*r2g
-      return
-      end
-
-
-
 
 cccccccccccccccccccccccccccccccccccccccccccc
       subroutine icams_angax2QM(ang,u,v,w,QM)
@@ -274,10 +194,6 @@ cccccccccccccccccccccccccccccccccccccccccccc
       implicit none
       real(8) QM(3,3)
       real(8) s,c,u2,v2,w2,ang,u,v,w,x1
-      real(8) pi,r2g,g2r
-      pi=dacos(-1.d0)
-      r2g=180/pi
-      g2r=pi/180
 
       x1=dsqrt(u**2+v**2+w**2)
       u2=u/x1
@@ -514,7 +430,6 @@ c-----3st invariant for tensor U
      1	  4.0*C1**3.0*C3 - 18.0 * C1*C2*C3 + 27.0 * C3**2.0)
 
       IF(X2<0)X2=0
-      F1=X1+dsqrt(X2)
       IFLAG1=0
       IF(F1<0)IFLAG1=1
       F2=X1-dsqrt(X2)

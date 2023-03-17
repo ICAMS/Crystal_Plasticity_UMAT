@@ -762,12 +762,31 @@ C              if no temp is defined use room temperature values
                c44   = 77.2d3
                crss0 = 170.d0
                Adir  = 5000.d0
+cc             Values for T=923 K
+cc               c11 = 196.06d3   
+cc               c12 = 81.99d3    
+cc               c44 = 57.01d3    
+cc               crss0 = 115.d0
+cc               Adir = 1.271d3
             end if
             c11_gl = c11
             c12_gl = c12
             c44_gl = c44
             tau0_gl = crss0
             Adir_gl = Adir
+            Mstiff(:,:)=0
+            Mstiff(1,1)=c11
+            Mstiff(2,2)=c11
+            Mstiff(3,3)=c11
+            Mstiff(4,4)=c44*2
+            Mstiff(5,5)=c44*2
+            Mstiff(6,6)=c44*2
+            Mstiff(2,3)=c12
+            Mstiff(3,2)=c12
+            Mstiff(1,3)=c12
+            Mstiff(3,1)=c12
+            Mstiff(1,2)=c12
+            Mstiff(2,1)=c12
          return 
          endsubroutine          
             
@@ -793,19 +812,19 @@ c        +----------------------------+
             Dvct(11,:)=[ 1,  0, -1] ; Nvct(11,:)=[  1, -1,  1]
             Dvct(12,:)=[ 1,  1,  0] ; Nvct(12,:)=[  1, -1,  1]
 
-            Mstiff(:,:)=0
-            Mstiff(1,1)=c11
-            Mstiff(2,2)=c11
-            Mstiff(3,3)=c11
-            Mstiff(4,4)=c44*2
-            Mstiff(5,5)=c44*2
-            Mstiff(6,6)=c44*2
-            Mstiff(2,3)=c12
-            Mstiff(3,2)=c12
-            Mstiff(1,3)=c12
-            Mstiff(3,1)=c12
-            Mstiff(1,2)=c12
-            Mstiff(2,1)=c12
+cc            Mstiff(:,:)=0
+cc            Mstiff(1,1)=c11
+cc            Mstiff(2,2)=c11
+cc            Mstiff(3,3)=c11
+cc            Mstiff(4,4)=c44*2
+cc            Mstiff(5,5)=c44*2
+cc            Mstiff(6,6)=c44*2
+cc            Mstiff(2,3)=c12
+cc            Mstiff(3,2)=c12
+cc            Mstiff(1,3)=c12
+cc            Mstiff(3,1)=c12
+cc            Mstiff(1,2)=c12
+cc            Mstiff(2,1)=c12
 
             do is=1,N_slip
             Lvct(is,1)=Nvct(is,2)*Dvct(is,3)-Nvct(is,3)*Dvct(is,2)
@@ -875,6 +894,7 @@ c        c----------------------------c
             real(8) refv_pk2i,refv_IVB
             real(8) IVB_ini(Nslp_mx)
 c            print*,'sub_get_param: ',crss0, c11, Adir
+            call param_temp_Austenite(temp_cur)
             Nslp               = N_slip
             STFei26            = Mstiff
             smdMi (1:Nslp,:,:) = Msmd
@@ -1730,7 +1750,7 @@ c--------evolution rate, derivative of evolution rate w.r.t. pk2i,IVB
      &              dgmdt,ddgmdt_dtau,ddgmdt_dIVB,
      &              dIVBdt,ddIVBdt_ddgmdt,ddIVBdt_dIVB,ising)
             else
-               print*,'no this material',ialloy
+               print*,'Unknown material ',ialloy
                call xit
             endif         
             return
