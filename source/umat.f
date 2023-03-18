@@ -190,7 +190,7 @@ c----------------------------------------------------------------------------
       endif
 
       temp_cur = temp  ! set global variable to current temperature
-      call set_param_temp(temp)
+cc      call set_param_temp(temp)
 c
 c---------------------------------------------------------c
 c     state initialization values for ABQUS statev        c
