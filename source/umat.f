@@ -13,6 +13,7 @@ c +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C     -------------------------------------------------------------------------------                                                                                                                  
       REAL(8), PARAMETER :: R_gas     = 8.314d0      ! Nm/K/mol     Gas constant                        
       REAL(8), PARAMETER :: NAvg      = 6.022141d23  ! 1/mol        Avogardo Number
+      REAL(8), PARAMETER :: temp_min  = 294.0d0      ! K            standard temp if not def. in model
       REAL(8)            :: temp_cur                 ! K            current temperature
 c     temperature-dependent material parameters for austenite
       REAL(8)            :: c11_gl, c12_gl, c44_gl   ! MPa          elast. constants
@@ -56,7 +57,7 @@ c +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
       if(lop==0)then   !ini
          print*, kinc,dtime,time(2), 'First call, initialization...'
-         temp_cur= 0.d0  ! Can initial temp be queried in uexternaldb???
+         temp_cur= temp_min  ! Can initial temp be queried in uexternaldb???
          call mod_gspt_ini
          call mod_alls_ini(IB1,IB2)       
          call mod_wkcp_ini(IB1,IB2)
@@ -189,8 +190,7 @@ c----------------------------------------------------------------------------
         stop
       endif
 
-      temp_cur = temp  ! set global variable to current temperature
-cc      call set_param_temp(temp)
+      temp_cur = max(temp, temp_min)  ! set global variable to current or minimum temp
 c
 c---------------------------------------------------------c
 c     state initialization values for ABQUS statev        c

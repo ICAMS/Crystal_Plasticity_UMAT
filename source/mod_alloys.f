@@ -739,24 +739,20 @@ c================================================================
 c================================================================
 c    define temperature-dependent paramaters for Austenite
 c================================================================           
-         subroutine param_temp_Austenite(temp)          
+         subroutine param_temp_Austenite()          
             implicit none           
 C           define values for elastic constants and CRSS according to
 C           Shahmardani&Hartmaier, Metallurgical and Materials Transaction A (2023)
 C           https://doi.org/10.1007/s11661-023-06958-5
-            real(8) temp
-            if(abs(temp-temp_cur)>1.d-5)then
-               print*,'Inconsistent temperatures in param_temp_Aust',temp,temp_cur
-            end if
 
-            if(temp_cur>1.d0)then
+            if(temp_cur>300.d0)then
                c11   = 283.16d3 - 102.5d0*temp_cur
                c12   = 118.08d3 - 42.5d0*temp_cur
                c44   = 82.49d3  - 30.0d0*temp_cur
                crss0 = 292.83d0 - 0.21d0*temp_cur  ! NOTE: Error in publication!
                Adir  = 5092.d0 - 4.d0*temp_cur
             else
-C              if no temp is defined use room temperature values
+C              if no temp or temp <300K is defined, use room temperature values
                c11   = 256.5d3
                c12   = 111.1d3
                c44   = 77.2d3
@@ -798,7 +794,7 @@ c        +----------------------------+
             implicit none
             integer i,j,is,js,IB1(9),IB2(9)
             real(8) x1,x2,x3
-            call param_temp_Austenite(temp_cur)
+            call param_temp_Austenite()
             Dvct( 1,:)=[ 0,  1, -1] ; Nvct( 1,:)=[ -1,  1,  1]
             Dvct( 2,:)=[ 1,  0,  1] ; Nvct( 2,:)=[ -1,  1,  1]
             Dvct( 3,:)=[ 1,  1,  0] ; Nvct( 3,:)=[ -1,  1,  1]
@@ -893,8 +889,8 @@ c        c----------------------------c
             real(8) vn_slp(Nslp_mx,3) 
             real(8) refv_pk2i,refv_IVB
             real(8) IVB_ini(Nslp_mx)
-c            print*,'sub_get_param: ',crss0, c11, Adir
-            call param_temp_Austenite(temp_cur)
+
+            call param_temp_Austenite()  ! set temp-dependent mat. parameters
             Nslp               = N_slip
             STFei26            = Mstiff
             smdMi (1:Nslp,:,:) = Msmd
@@ -1618,17 +1614,6 @@ c--------evolution rate, derivative of evolution rate w.r.t. pk2i,IVB
             call sub_constant_ini_Nickel(IB1,IB2)
             return
          endsubroutine
-
-         ! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-         ! +   Set temperature-dependent material parameters               +
-         ! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-         subroutine set_param_temp(temp)
-            implicit none
-            real(8) temp
-
-            call param_temp_Austenite(temp)
-            return
-         end subroutine set_param_temp
 
          ! +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
          ! +   Get material parameters for for (ie, ig)                    +
