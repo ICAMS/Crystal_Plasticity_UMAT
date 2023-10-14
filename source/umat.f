@@ -228,6 +228,7 @@ c---------------------------------------------------------c
          Fe (ib1(i),ib2(i))=statev(22+i)
          Fp0(ib1(i),ib2(i))=statev(31+i)
          Fp (ib1(i),ib2(i))=statev(31+i)
+         Qm (ib1(i),ib2(i))=statev(22+i)
       enddo
       do is=1,Nslp
          IVB0(is)=statev(40+0*Nslp+is)
@@ -289,6 +290,7 @@ c------------------------------------------------c
       
       ! plastic strain in crystal coordinates
       intLp=0.5*dt1*(Lp+transpose(Lp))
+      intLp=matmul(Qm, matmul(intLp, transpose(Qm)))
       statev(156)=statev(156)+intLp(1,1)
       statev(157)=statev(157)+intLp(2,2)
       statev(158)=statev(158)+intLp(3,3)
