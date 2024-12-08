@@ -12,7 +12,7 @@
  
  Usage by Abaqus command line interface:
  $ abaqus python analyze_odb_structured_nopbc_CP.py {jobname}
- will read {jobname.odb} and produce a new file {jobname}_sig_eps.csv
+ will read {jobname}.odb and produce a new file {jobname}_sig_eps.csv
  containing the homogenized data
 
 Authors:

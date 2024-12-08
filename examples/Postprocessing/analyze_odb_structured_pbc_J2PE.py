@@ -15,7 +15,7 @@
  
  Usage by Abaqus command line interface:
  $ abaqus python analyze_odb_structured_pbc_J2PE.py {jobname}
- will read {jobname.odb} and produce a new file {jobname}_sig_eps.csv
+ will read {jobname}.odb and produce a new file {jobname}_sig_eps.csv
  containing the homogenized data
  Calculates plastic strain from SDV defined in ICAMS CP-UMAT
 
