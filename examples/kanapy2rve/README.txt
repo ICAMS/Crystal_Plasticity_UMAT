@@ -8,8 +8,8 @@ generate_rve.ipynb -> {geometry}.inp {material}.inp
 
 #
 # On cip-sim{n}:
-module load anaconda/2019
-module load abaqus/6.14
+module load anaconda/latest
+module load abaqus/latest
 cp -r abq_template {job_directory}
 cp ../../source/* {job_directory}
 cp {geometry}.inp {job_directory}
@@ -17,8 +17,8 @@ cp {material}.inp {job_directory}/Material.inp
 mv {job_directory} /scratch/{user}
 cd /scratch/{user}/{job_directory}
 python Create_PeriodicBC_EDGE_3D.py {geometry}.inp
-abq6142 job={jobname} inp=Fatigue_BC_Amp_05.inp user=umat.f cpus=4 &
+abaqus job={jobname} inp=Fatigue_BC_Amp_05.inp user=umat.f &
 
 #
 # After Abaqus completed:
-abq6142 python AbaqusOdbPostprocessor_2020.py {jobname} -> {jobname}_sig_eps.csv
+abaqus python analyze_odb_structured_CP.py {jobname} -> {jobname}_sig_eps.csv
