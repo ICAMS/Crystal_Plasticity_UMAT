@@ -1020,3 +1020,49 @@ c +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
          return
          end
+c +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+c +                                                               +
+c +   write output files for Octree debugging                     +
+c +                                                               +
+c +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      subroutine writeDataFiles(FEMINF,FFTINF,FEMXYZ,FFTXYZ,
+     &    NELE,NGPT,NFTX,NFTY,NFTZ,
+     &   filename1,filename2)
+c
+      implicit none
+c
+      integer NELE,NGPT,NFTX,NFTY,NFTZ
+      integer i,j,k,l,m
+      real(8) femxyz    (NELE,NGPT,3)
+      real(8) fftxyz    (NFTX,NFTY,NFTZ,3)
+      integer FEMINF(NELE,NGPT,4)
+      integer FFTINF(NFTX,NFTY,NFTZ,3)
+      integer lenoutdir, line
+      character(LEN=256) filename1,filename2, file_path, file_path2 
+      character(LEN=256)  PCWD
+      call GETOUTDIR(PCWD,LENOUTDIR)  
+      file_path = TRIM(PCWD) // TRIM('/') // TRIM(filename1)   
+      file_path2 = TRIM(PCWD) // TRIM('/') // TRIM(filename2) 
+c      
+      open(10,file=file_path,status="replace", action="write")
+      do i =1,NFTX
+         do j = 1,NFTY
+            do k = 1,NFTZ
+               l = fftINF(i,j,k,1)
+               m = fftInf(i,j,k,2)
+               write(10,*)fftInf(i,j,k,:)
+               write(10,*)fftxyz(i,j,k,:)
+               write(10,*)femxyz(l,m,:)
+            enddo
+         enddo
+      enddo
+      close(10)
+      open(20,file=file_path2,status="replace", action="write")
+      do i =1,NELE
+         do j = 1,NGPT
+            write(20,*)femInf(i,j,:)
+         enddo
+      enddo
+      close(20)
+      return
+      end
