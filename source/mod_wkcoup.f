@@ -15,6 +15,7 @@ c================================================================
          integer, parameter :: Iwkcoup_int=0   !-->with(1), without(0)
          integer, parameter :: Iwkcoup_sup=0   !-->with(1), without(0)
          integer, parameter :: Iwkcoup_bk=3    !-->with(1)AFKH, with(2)CHKH, with(3)OWKH, without(0)
+         integer, parameter :: Ioct_search=1   !-->with(1) Octree-search, with(2) Brute-Force search
       endmodule mod_mesh_grid_size
 
 
@@ -26,6 +27,7 @@ c
 c================================================================
       module mod_wkcoup_grad
          use mod_mesh_grid_size
+         use mod_octree
          implicit none
          integer, parameter :: I_gnd_iso = 1       !-->with(1),without(0)
          integer, parameter :: I_gnd_kin = 1       !-->with(1),without(0)  
@@ -90,6 +92,17 @@ c================================================================
          real(8) z_min,z_max,z_add
          real(8) Lenx,Leny,Lenz,x_tmp
          integer ix,iy,iz,i1,i2,j1,j2,iex,igx,idx
+c        Octree variables
+         integer maxpoint, index, id
+         integer mapFEM(Tnel*Tngp,2)
+         integer mapFFT(Tnfx*Tnfy*Tnfz,3)
+         real(8) fem(3,Tnel*Tngp)
+         real(8) fft(3,Tnfx*Tnfy*Tnfz)
+         real(8) tol_box, dist
+         type(oct_t) :: octFEM
+         type(oct_t) :: octFFT
+         character(LEN=256) filename1,filename2
+         real(8) start_time,stop_time !time measurement
 
          CD_parts(1)=CD_smooth        ! inside  domain
          CD_parts(2)=CD_parts(1)   ! outside domain, rigid
@@ -164,6 +177,12 @@ c================================================================
             !----------------------------------------------------
             ! Connection between FFT and FEM and BCs
             !----------------------------------------------------
+            if(Ioct_search==0)then
+            !-----------------------------------------
+            write(*,*)'Start brute force search time',maxpoint
+            !call flush()
+            call cpu_time(start_time)
+            !-----------------------------------------
             fft_Inf=0
             do ix=1,Tnfx
             do iy=1,Tnfy
@@ -217,9 +236,147 @@ c================================================================
             endif
             enddo
             enddo
-
-         endif
-
+            ! for debugging 
+c            filename1 = "FFTInf.txt"
+c            filename2 = "FEMInf.txt"
+c            call writeDataFiles(FEM_INF,FFT_INF,FEM_XYZ,FFT_XYZ,
+c     &      Tnel,Tngp,Tnfx,Tnfy,Tnfz,
+c     &      filename1,filename2)
+c
+            !-----------------------------------------
+            call cpu_time(stop_time)
+            write(*,*) 'brute force took time:',stop_time-start_time
+            call flush()
+            !-----------------------------------------
+c
+            !-----------------------------------------
+            !Search points fft<->fem with octree
+            !-----------------------------------------
+            elseif(Ioct_search==1)then
+            !-----------------------------------------
+            write(*,*)'Start Octree search time'
+            !call flush()
+            call cpu_time(start_time)
+            !-----------------------------------------
+            fft_Inf=0
+            ! Map fem_xyz and fft_xyz to 2D shape array
+            fem = 0.D0
+            mapFem = 0
+            index = 0
+            do i = 1, Tnel
+            do j = 1, Tngp
+               index = index + 1
+               fem(1, index) = fem_xyz(i, j, 1)  ! x-coordinate
+               fem(2, index) = fem_xyz(i, j, 2)  ! y-coordinate
+               fem(3, index) = fem_xyz(i, j, 3)  ! z-coordinate
+               mapFEM(index,1)=i
+               mapFEM(index,2)=j 
+            enddo
+            enddo
+            ! Get box size and num max per octant
+            tol_box = 1.D0*max(BOX_x(4)-BOX_x(1),BOX_y(4)-BOX_y(1),
+     &      BOX_z(4) - BOX_z(1)) 
+            IF(Tnel*Tngp.le.64000)then
+               maxpoint = Tnel*Tngp
+            ELSE
+               maxpoint = Tnel * Tngp/16
+            ENDIF
+            ! produces best results, may more study necessary
+            ! initialize octree
+            octFEM = octree_init(fem,maxpoint,[BOX_x(1)-tol_box,
+     &         BOX_y(1)-tol_box,BOX_z(1)-tol_box],
+     &        [BOX_x(4)+tol_box,BOX_y(4)+tol_box,BOX_z(4)+tol_box]) 
+            ! connection between fft and fem and bcs
+            do ix = 1, Tnfx
+               do iy = 1, Tnfy
+                  do iz = 1, Tnfz
+                     x1 = fft_xyz(ix, iy, iz, 1)
+                     x2 = fft_xyz(ix, iy, iz, 2)
+                     x3 = fft_xyz(ix, iy, iz, 3)
+                     iex=0; igx=0
+                     dist = huge(dist)
+                     id = octree_find(octFEM, [x1, x2, x3],dist)
+                     if (id /= 0) then
+                        ! get 'i' and 'j' from 'index'
+                        iex = mapFEM(id,1)
+                        igx = mapFEM(id,2)
+                     else
+                        write(*,*) 'No closest point found'
+                        ! stop condition necessary?
+                     end if
+                     idx = 1
+                     if (x1 < BOX_x(2)) idx = 2
+                     if (x1 > BOX_x(3)) idx = 3
+                     if (x2 < BOX_y(2)) idx = 4
+                     if (x2 > BOX_y(3)) idx = 5
+                     if (x3 < BOX_z(2)) idx = 6
+                     if (x3 > BOX_z(3)) idx = 7
+                     fft_Inf(ix, iy, iz, 1:3) = [iex, igx, idx]
+                     fft_CD(ix,iy,iz)=CD_ref 
+                  end do
+               end do
+            end do
+         ! Map fem_xyz and fft_xyz to 2D shape array
+            fft = 0.D0
+            mapFFT = 0
+            index = 0
+            do i = 1, Tnfx
+               do j = 1, Tnfy
+                  do k = 1, Tnfz
+                     ! Store coordinates in fft
+                  if(fft_Inf(i,j,k,3)==1)then
+                     index = index + 1 
+                     fft(1, index) = fft_xyz(i, j, k, 1) ! x-coordinate
+                     fft(2, index) = fft_xyz(i, j, k, 2) ! y-coordinate
+                     fft(3, index) = fft_xyz(i, j, k, 3) ! z-coordinate
+                     mapFFT(index,1)=i
+                     mapFFT(index,2)=j
+                     mapFFT(index,3)=k
+                  endif
+                  enddo
+               enddo
+            enddo
+            if(index.le.32*32*32)then
+               maxpoint = index
+            else
+               maxpoint=index/8
+            endif
+         ! produces best results, may more study necessary
+         ! initialize octrees
+         octFFT=octree_init(fft(:,1:index),maxpoint,[BOX_x(1)-tol_box,
+     &         BOX_y(1)-tol_box,BOX_z(1)-tol_box],
+     &         [BOX_x(4)+tol_box,BOX_y(4)+tol_box,BOX_z(4)+tol_box])           
+c
+            do i1 = 1,Tnel
+               do i2 = 1,Tngp
+                  x1=fem_xyz(i1,i2,1)
+                  x2=fem_xyz(i1,i2,2)
+                  x3=fem_xyz(i1,i2,3)
+                  dist=huge(dist)
+                  id = octree_find(octFFT, [x1, x2, x3],dist)
+                  if (id /= 0) then
+                  ix = mapFFT(id,1)
+                  iy = mapFFT(id,2)
+                  iz = mapFFT(id,3)
+                  fem_Inf(i1,i2,2:4)=[ix,iy,iz]
+                  endif
+               enddo
+            enddo
+            ! debbuging octree search
+c            filename1 = "FFTInfOcTree.txt"
+c            filename2 = "FEMInfOctree.txt"
+c            call writeDataFiles(FEM_INF,FFT_INF,fem_xyz,FFT_XYZ,
+c     &      Tnel,Tngp,Tnfx,Tnfy,Tnfz,
+c     &      filename1,filename2)
+c
+            !-----------------------------------------
+            call cpu_time(stop_time)
+            write(*,*) 'Octree took time:',stop_time-start_time
+            !call flush()
+            !-----------------------------------------
+            endif ! end if switch octree search
+c
+         endif ! if(Icall_fem_fft_map==0)then
 
          fem_dFpp=0
          fem_dFpp_1gd=0
