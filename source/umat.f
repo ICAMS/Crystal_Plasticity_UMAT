@@ -27,6 +27,7 @@ c +                                                                         +
 c +   Include other subroutines                                             +
 c +                                                                         +
 c +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      include "mod_octree.f"
       include "mod_gaussp.f"            
       include "mod_alloys.f"            
       include "mod_wkcoup.f"
