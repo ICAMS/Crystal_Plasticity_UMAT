@@ -5,16 +5,16 @@ c
 c================================================================
       module mod_mesh_grid_size
          implicit none
-         integer, parameter :: Tnel=27000
+         integer, parameter :: Tnel=64
          integer, parameter :: Tngp=8
-         integer, parameter :: Tnfx=64
-         integer, parameter :: Tnfy=64
-         integer, parameter :: Tnfz=64
+         integer, parameter :: Tnfx=16
+         integer, parameter :: Tnfy=16
+         integer, parameter :: Tnfz=16
          integer, parameter :: Iwkcoup_trip=0  !-->with(1), without(0) 
-         integer, parameter :: Iwkcoup_grad=0  !-->with(1), without(0) 
+         integer, parameter :: Iwkcoup_grad=1  !-->with(1), without(0) 
          integer, parameter :: Iwkcoup_int=0   !-->with(1), without(0)
          integer, parameter :: Iwkcoup_sup=0   !-->with(1), without(0)
-         integer, parameter :: Iwkcoup_bk=3    !-->with(1)AFKH, with(2)CHKH, with(3)OWKH, without(0)
+         integer, parameter :: Iwkcoup_bk=0    !-->with(1)AFKH, with(2)CHKH, with(3)OWKH, without(0)
          integer, parameter :: Ioct_search=1   !-->with(1) Octree-search, with(2) Brute-Force search
       endmodule mod_mesh_grid_size
 
@@ -246,7 +246,7 @@ c
             !-----------------------------------------
             call cpu_time(stop_time)
             write(*,*) 'brute force took time:',stop_time-start_time
-            call flush()
+            !call flush()
             !-----------------------------------------
 c
             !-----------------------------------------
@@ -1216,11 +1216,11 @@ c================================================================
          use GlobalValue
          implicit none 
 
-         real(8) fem_bk(Tnel,Tngp,N_slp)
-         real(8) fem_bk_ch(Tnel,Tngp,N_slp,3)
-         real(8) fem_dbkdt(Tnel,Tngp,N_slp)
-         real(8) fem_dbkdt_ch(Tnel,Tngp,N_slp,3)
-         real(8) fem_dgmdt(Tnel,Tngp,N_slp)
+         real(8) fem_bk(Tnel,Tngp,N_slip)
+         real(8) fem_bk_ch(Tnel,Tngp,N_slip,3)
+         real(8) fem_dbkdt(Tnel,Tngp,N_slip)
+         real(8) fem_dbkdt_ch(Tnel,Tngp,N_slip,3)
+         real(8) fem_dgmdt(Tnel,Tngp,N_slip)
                             
       contains			
 c================================================================	
@@ -1253,7 +1253,7 @@ c AFKH
           if (Iwkcoup_bk.eq.1) then
           do i1=1,Tnel
           do i2=1,Tngp          
-          do is=1,N_slp
+          do is=1,N_slip
            fem_dbkdt(i1,i2,is) = Adir*fem_dgmdt(i1,i2,is)-    
      &     Adyn*fem_bk(i1,i2,is)*dabs(fem_dgmdt(i1,i2,is))
 
@@ -1268,7 +1268,7 @@ c CHKH
           if (Iwkcoup_bk.eq.2) then
           do i1=1,Tnel
           do i2=1,Tngp          
-          do is=1,N_slp
+          do is=1,N_slip
           fem_dbkdt_ch(i1,i2,is,1) = A1*fem_dgmdt(i1,i2,is)-    
      &     B1*fem_bk_ch(i1,i2,is,1)*dabs(fem_dgmdt(i1,i2,is))
 
@@ -1292,7 +1292,7 @@ c OWKH
           if (Iwkcoup_bk.eq.3) then
           do i1=1,Tnel
           do i2=1,Tngp          
-          do is=1,N_slp
+          do is=1,N_slip
            fem_dbkdt(i1,i2,is) = Adir*fem_dgmdt(i1,i2,is)-    
      &     Adyn*(dabs(fem_bk(i1,i2,is))/(Adir/Adyn))**M_OW
      &     *fem_bk(i1,i2,is)*dabs(fem_dgmdt(i1,i2,is))
@@ -1313,7 +1313,7 @@ c================================================================
          subroutine sub_bk_effect(iex,igx,IB1,IB2,IVB_bk)
          implicit none
          integer IB1(9),IB2(9),iex,igx       
-         real(8) IVB_bk(N_slp)
+         real(8) IVB_bk(N_slip)
 
          IVB_bk(:)=fem_bk(iex,igx,:)
 
