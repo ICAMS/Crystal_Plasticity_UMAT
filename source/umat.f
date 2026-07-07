@@ -116,6 +116,7 @@ C   SDV156-161 : plastic strain in crystal coordinates
 C   SDV162-164 : C11, C12, C44 (MPa); temperature-dependent elastic constants
 C   SDV165     : tau0 (MPa); temperature-dependent critical resolved shear stress
 C   SDV166     : Adir (MPa); temperature-dependent parameter for isotropic hardening
+C   SDV167     : equivalent plastic strain
 C
 C    Material Properties
 C ----------------------------------------------------------------------
@@ -177,7 +178,7 @@ c---------------------------------------------------------------------------
       real(8) x1,x2,x3,xx
       real(8) mx33_1(3,3)
       real(8) phi1,phi,phi2,Qm(3,3)
-      real(8) intLp(3,3),el_st(3,3)
+      real(8) intLp(3,3),el_st(3,3),devLp(3,3),trLp,peeq_inc
 c----------------------------------------------------------------------------
       ialloy = int(props(1))
       eang00(1:3) = props(2:4)
@@ -207,6 +208,7 @@ c---------------------------------------------------------c
          statev( 5:10)=0                         !!-->05-10 cs0
          statev(11:16)=0                         !!-->11-16 pk2i0
          statev(17:22)=0                         !!-->17-22 pk2i0_gnd
+         statev(167)=0                           !!-->167 equivalent plastic strain
          do i=1,9
             statev(22+i)=mx33_1(ib1(i),ib2(i))   !!-->23-31 Fe0
             statev(31+i)=mx33_1(ib2(i),ib1(i))   !!-->32-40 Fp0
@@ -298,6 +300,16 @@ c------------------------------------------------c
       statev(159)=statev(159)+intLp(1,2)
       statev(160)=statev(160)+intLp(1,3)
       statev(161)=statev(161)+intLp(2,3) 
+      trLp=(intLp(1,1)+intLp(2,2)+intLp(3,3))/3.0d0
+      devLp=intLp
+      devLp(1,1)=devLp(1,1)-trLp
+      devLp(2,2)=devLp(2,2)-trLp
+      devLp(3,3)=devLp(3,3)-trLp
+      peeq_inc=sqrt(2.0d0/3.0d0*
+     &              (devLp(1,1)**2+devLp(2,2)**2+devLp(3,3)**2
+     &              +2.0d0*(devLp(1,2)**2+devLp(1,3)**2
+     &              +devLp(2,3)**2)))
+      statev(167)=statev(167)+peeq_inc
       
       ! temperature-dependent material parameters
       statev(162) = c11_gl
