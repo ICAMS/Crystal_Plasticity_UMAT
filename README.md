@@ -26,8 +26,9 @@ $ pip install -r requirements.txt
 3. Extract crystal plasticity parameters as include (.inc) files for used materials from database, e.g. with  
 
    ```bash
-$ mat-extract-params copper_generic --outdir includes
-```  
+   $ mat-extract-params copper_generic --outdir includes
+   ```  
+
 **Note:** Upon the first use, you need to initialize the mat-data-handler with  
 
    ```bash
@@ -36,13 +37,14 @@ $ mat-extract-params copper_generic --outdir includes
 4. The material definition in the .inp file should look like:  
 
     ```text
-*Material, name=GRAIN1_MAT  
-*Depvar  
-    360  
-*User Material, constants=22  
-0., 4.78247643390494, 2.458599547570277, 5.60864095649018, 0., 0., 0., 0.  
-*Include, input="copper_inp_14p.inc"
-```
+    *Material, name=GRAIN1_MAT  
+    *Depvar  
+        360  
+    *User Material, constants=22  
+    0., 4.78247643390494, 2.458599547570277, 5.60864095649018, 0., 0., 0., 0.  
+    *Include, input="copper_inp_14p.inc"
+    ```
+
 for each single crystalline section to which a marterial is assigned, here GRAIN1_MAT. After `*User Material` the number of constant (NPROPS) needs to be specified as the number of parameters in the .inc file for the material plus 8 for the additional elements in the first row. These additional elements contain a legacy index for the specified material (ignored), the three Bunge-Euler angles specifying the crystallographic orientation of the grain in the global coordinate frame in radians, and four spare parameters. Legacy and spare parameter may take any value, but are recommended to be set to "0." After this line of 8 parameters (required by Abaqus), the `*Include` command for the file with the remaining material parameters follows. These parameters will be available as PROPS[9:] within the UMAT.  
 **Note:** For downwards compatibility the UMAT accepts a four-parameter legacy input format: a legacy material identifier
 and three Bunge-Euler angles in radians. This selects the hard-coded
