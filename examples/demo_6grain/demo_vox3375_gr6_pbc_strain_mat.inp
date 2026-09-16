@@ -1,0 +1,39 @@
+**
+** MATERIALS
+**
+*Material, name=GRAIN1_MAT
+*Depvar
+    360
+*User Material, constants=22
+4.0, 4.78247643390494, 2.458599547570277, 5.60864095649018, 0., 0., 0., 0.
+*Include, input="copper_inp_14p.inc"
+*Material, name=GRAIN2_MAT
+*Depvar
+    360
+*User Material, constants=22
+4.0, 3.256888423407736, 2.8708232146884387, 2.523335396225134, 0., 0., 0., 0.
+*Include, input="copper_inp_14p.inc"
+*Material, name=GRAIN3_MAT
+*Depvar
+    360
+*User Material, constants=22
+4.0, 2.248356669198425, 0.8755114027563698, 2.907833979823441, 0., 0., 0., 0.
+*Include, input="copper_inp_14p.inc"
+*Material, name=GRAIN4_MAT
+*Depvar
+    360
+*User Material, constants=22
+4.0, 3.6171360026436146, 0.7143633616560285, 5.9276182303753355, 0., 0., 0., 0.
+*Include, input="copper_inp_14p.inc"
+*Material, name=GRAIN5_MAT
+*Depvar
+    360
+*User Material, constants=22
+4.0, 3.10788672786175, 1.7359778896021738, 5.5450145250153495, 0., 0., 0., 0.
+*Include, input="copper_inp_14p.inc"
+*Material, name=GRAIN6_MAT
+*Depvar
+    360
+*User Material, constants=22
+4.0, 3.9914869416407686, 1.8297279832509066, 5.375241031146694, 0., 0., 0., 0.
+*Include, input="copper_inp_14p.inc"
