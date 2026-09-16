@@ -144,3 +144,5 @@ media
 static
 
 .DS_Store
+includes/
+
