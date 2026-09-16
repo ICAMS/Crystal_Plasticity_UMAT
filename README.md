@@ -16,7 +16,7 @@ Crystal Plasticity User Material (UMAT) subroutine for Abaqus FEM. Implements ra
 All requirements can be installed into your local environment by
 
 ```bash
-$ pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ## Quick Start
@@ -26,14 +26,15 @@ $ pip install -r requirements.txt
 3. Extract crystal plasticity parameters as include (.inc) files for used materials from database, e.g. with  
 
    ```bash
-   $ mat-extract-params copper_generic --outdir includes
+   mat-extract-params copper_generic --outdir includes
    ```  
 
-**Note:** Upon the first use, you need to initialize the mat-data-handler with  
+    **Note:** Upon the first use, you need to initialize the mat-data-handler with  
 
    ```bash
-   $ mat-extract-params --help
+   mat-extract-params --help
    ```
+   
 4. The material definition in the .inp file should look like:  
 
     ```text
@@ -59,7 +60,7 @@ including when multiple threads initialize it.
 For command line submission, see `examples/demo_6grain`:
 
     ```bash
-    $ abaqus job=demo-6gr inp=demo_vox3375_gr6_pbc_strain_geom.inp user=umat.f cpus=4 inter
+    abaqus job=demo-6gr inp=demo_vox3375_gr6_pbc_strain_geom.inp user=umat.f cpus=4 inter
     ```
 
 For threaded runs and one-CPU references, configure full OpenMP compilation and
