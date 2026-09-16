@@ -93,7 +93,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full test workflow and how to reg
 
 ```
 src/                       Fortran UMAT source
-materials/                 Material parameters 
+src-legacy/                Legacy source code
 tests/
   integration/             Abaqus regression tests (require Abaqus)
   unit/                    Pure-Fortran unit tests (planned, no Abaqus needed)
